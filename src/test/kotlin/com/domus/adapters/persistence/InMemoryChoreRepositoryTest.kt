@@ -1,35 +1,42 @@
 package com.domus.adapters.persistence
 
 import com.domus.core.chore.Chore
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class InMemoryChoreRepositoryTest {
 
+    private val repository = InMemoryChoreRepository()
+
     @Test
     fun `findAll returns empty list when no chores exist`() {
-        val repository = InMemoryChoreRepository(emptyMap())
         val result = repository.findAll()
         assertTrue(result.isEmpty())
     }
 
     @Test
     fun `findAll returns all saved chores`() {
-        val chore1 = Chore(name = "Clean kitchen")
-        val chore2 = Chore(name = "Do laundry")
-        val repository = InMemoryChoreRepository(
-            mapOf(
-                Pair(UUID.randomUUID(), chore1),
-                Pair(UUID.randomUUID(), chore2)
-            )
-        )
+        assertTrue(repository.save(Chore(name = "Clean kitchen")))
+        assertTrue(repository.save(Chore(name = "Do laundry")))
 
         val result = repository.findAll()
 
         assertEquals(2, result.size)
         assertTrue(result.any { it.name == "Clean kitchen" })
         assertTrue(result.any { it.name == "Do laundry" })
+    }
+
+    @Test
+    fun `duplicated chores are not saved`() {
+        val chore = Chore(name = "Clean kitchen")
+        assertTrue(repository.save(chore))
+        assertFalse(repository.save(chore))
+
+        val result = repository.findAll()
+
+        assertEquals(1, result.size)
+        assertTrue(result.any { it.name == "Clean kitchen" })
     }
 }

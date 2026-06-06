@@ -13,7 +13,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpStatus
-import java.util.UUID
+import org.springframework.test.annotation.DirtiesContext
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ChoreIntegrationTest {
@@ -22,13 +22,27 @@ class ChoreIntegrationTest {
     private lateinit var restTemplate: TestRestTemplate
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     fun `getChores returns 200 and list with seeded chores`() {
         val response = restTemplate.getForEntity("/api/chores", Array<Chore>::class.java)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).hasSize(2)
-        assertThat(response.body!![0].name).isEqualTo("Clean kitchen")
-        assertThat(response.body!![1].name).isEqualTo("Do laundry")
+        assertThat(response.body!!.map { it.name })
+            .containsExactlyInAnyOrder("Clean kitchen", "Do laundry")
+    }
+
+    @Test
+    fun `addChore returns 200 for new chore`() {
+        val response = restTemplate.postForEntity("/api/chore", Chore(name = "New chore"), String::class.java)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+    }
+
+    @Test
+    fun `addChore returns 409 for duplicate chore`() {
+        val response = restTemplate.postForEntity("/api/chore", Chore(name = "Clean kitchen"), String::class.java)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.CONFLICT)
     }
 
     @TestConfiguration
@@ -37,12 +51,10 @@ class ChoreIntegrationTest {
         @Bean
         @Primary
         fun choreRepository(): ChoreRepository {
-            return InMemoryChoreRepository(
-                mapOf(
-                    UUID.randomUUID() to Chore(name = "Clean kitchen"),
-                    UUID.randomUUID() to Chore(name = "Do laundry")
-                )
-            )
+            val repo = InMemoryChoreRepository()
+            repo.save(Chore(name = "Clean kitchen"))
+            repo.save(Chore(name = "Do laundry"))
+            return repo
         }
     }
 }
