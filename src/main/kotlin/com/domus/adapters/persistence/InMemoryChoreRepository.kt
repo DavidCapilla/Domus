@@ -6,7 +6,10 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-class InMemoryChoreRepository(private val chores: Map<UUID, Chore>) : ChoreRepository {
+class InMemoryChoreRepository() : ChoreRepository {
 
-    override fun findAll(): List<Chore> = chores.values.toList()
+    private val chores: MutableSet<Chore> = HashSet()
+
+    override fun findAll() = chores.toList()
+    override fun save(chore: Chore) = chores.add(chore)
 }
