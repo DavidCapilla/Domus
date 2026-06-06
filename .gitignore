@@ -1,0 +1,85 @@
+# =========================
+# IntelliJ / IDE
+# =========================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+*.class
+
+# VS Code
+.vscode/
+
+# =========================
+# Kotlin / Java / Gradle
+# =========================
+.gradle/
+build/
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+**/build/
+**/out/
+
+# Kotlin specific
+.kotlin/
+
+# Logs
+*.log
+logs/
+
+# =========================
+# Spring Boot
+# =========================
+application-local.yml
+application-dev.yml
+
+# If you use env-based config
+.env
+.env.*
+
+# =========================
+# OS junk
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Database (SQLite if you use it)
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# Keep schema migrations if you use Flyway/Liquibase
+!db/migration/**
+
+# =========================
+# Node / Frontend (if using HTMX + build tools)
+# =========================
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+
+# =========================
+# Raspberry Pi / deployment artifacts
+# =========================
+*.pid
+*.lock
+
+# =========================
+# Secrets
+# =========================
+*.key
+*.pem
+secrets/
+credentials.json
