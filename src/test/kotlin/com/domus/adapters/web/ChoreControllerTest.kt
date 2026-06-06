@@ -1,14 +1,16 @@
 package com.domus.adapters.web
 
-import com.domus.core.chore.Chore
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(ChoreController::class)
+@Import(ChoreControllerTestConfig::class)
 class ChoreControllerTest {
 
     @Autowired
@@ -16,10 +18,8 @@ class ChoreControllerTest {
 
     @Test
     fun `getChores returns list of chores`() {
-        val expected = """[{"name":"Placeholder chore"}]"""
-
         mockMvc.perform(get("/api/chores"))
             .andExpect(status().isOk)
-            .andExpect(content().json(expected))
+            .andExpect(jsonPath("$[0].name").value("Placeholder chore"))
     }
 }
