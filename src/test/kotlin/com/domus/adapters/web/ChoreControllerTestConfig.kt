@@ -1,5 +1,6 @@
 package com.domus.adapters.web
 
+import com.domus.application.chore.CreateChoreUseCase
 import com.domus.application.chore.ListChoresUseCase
 import com.domus.core.chore.Chore
 import com.domus.core.chore.ChoreRepository
@@ -16,6 +17,10 @@ class ChoreControllerTestConfig {
     @Bean
     fun listChoresUseCase(repo: ChoreRepository): ListChoresUseCase =
         ListChoresUseCase(repo)
+
+    @Bean
+    fun createChoreUseCase(repo: ChoreRepository): CreateChoreUseCase =
+        CreateChoreUseCase(repo)
 }
 
 class FakeChoreRepository : ChoreRepository {
