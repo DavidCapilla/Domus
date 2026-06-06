@@ -19,6 +19,14 @@ class ChoreControllerTestConfig {
 }
 
 class FakeChoreRepository : ChoreRepository {
-    override fun findAll(): List<Chore> =
-        listOf(Chore(name = "Placeholder chore"))
+
+    private val chores = mutableListOf(Chore(name = "Placeholder chore"))
+
+    override fun findAll(): List<Chore> = chores.toList()
+
+    override fun save(chore: Chore): Boolean {
+        val alreadyExists = chores.any { it == chore }
+        if (!alreadyExists) chores.add(chore)
+        return !alreadyExists
+    }
 }
