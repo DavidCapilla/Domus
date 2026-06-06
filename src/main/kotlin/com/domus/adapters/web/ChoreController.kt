@@ -1,5 +1,6 @@
 package com.domus.adapters.web
 
+import com.domus.application.chore.CreateChoreUseCase
 import com.domus.application.chore.ListChoresUseCase
 import com.domus.core.chore.Chore
 import com.domus.core.chore.ChoreAlreadyExistsException
@@ -14,7 +15,10 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api")
-class ChoreController(private val listChoresUseCase: ListChoresUseCase) {
+class ChoreController(
+    private val listChoresUseCase: ListChoresUseCase,
+    private val createChoreUseCase: CreateChoreUseCase,
+) {
 
     @GetMapping("/chores")
     fun getChores(): List<Chore> {
@@ -23,7 +27,7 @@ class ChoreController(private val listChoresUseCase: ListChoresUseCase) {
 
     @PostMapping("/chore")
     fun addChore(@RequestBody chore: Chore) {
-        listChoresUseCase.addChore(chore)
+        createChoreUseCase.addChore(chore)
     }
 
     @ExceptionHandler(ChoreAlreadyExistsException::class)
