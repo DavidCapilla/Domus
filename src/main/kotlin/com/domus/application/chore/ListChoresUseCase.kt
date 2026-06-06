@@ -10,4 +10,8 @@ open class ListChoresUseCase(val choreRepository: ChoreRepository) {
     fun getChores(): List<Chore> {
         return choreRepository.findAll()
     }
+
+    fun addChore(chore: Chore) {
+        choreRepository.save(chore)
+    }
 }

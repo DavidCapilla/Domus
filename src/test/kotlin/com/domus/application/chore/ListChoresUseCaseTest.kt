@@ -2,10 +2,12 @@ package com.domus.application.chore
 
 import com.domus.core.chore.Chore
 import com.domus.core.chore.ChoreRepository
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class ListChoresUseCaseTest {
@@ -27,5 +29,12 @@ class ListChoresUseCaseTest {
         whenever(repository.findAll()) doReturn emptyList()
         val result = useCase.getChores()
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `addChore saves chore to repository`() {
+        val chore = Chore(name = "Take out trash")
+        useCase.addChore(chore)
+        verify(repository).save(chore)
     }
 }
