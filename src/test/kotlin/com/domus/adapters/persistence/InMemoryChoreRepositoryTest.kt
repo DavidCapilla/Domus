@@ -42,16 +42,15 @@ class InMemoryChoreRepositoryTest {
 
     @Test
     fun `delete removes existing chore`() {
-        val chore = Chore(name = "Clean kitchen")
-        repository.save(chore)
+        repository.save(Chore(name = "Clean kitchen"))
 
-        assertTrue(repository.delete(chore))
+        assertTrue(repository.delete("Clean kitchen"))
         assertTrue(repository.findAll().isEmpty())
     }
 
     @Test
     fun `delete returns false for non-existent chore`() {
-        assertFalse(repository.delete(Chore(name = "Non-existent")))
+        assertFalse(repository.delete("Non-existent"))
     }
 
     @Test
@@ -59,7 +58,7 @@ class InMemoryChoreRepositoryTest {
         repository.save(Chore(name = "Clean kitchen"))
         repository.save(Chore(name = "Do laundry"))
 
-        assertTrue(repository.delete(Chore(name = "Clean kitchen")))
+        assertTrue(repository.delete("Clean kitchen"))
 
         val result = repository.findAll()
         assertEquals(1, result.size)
