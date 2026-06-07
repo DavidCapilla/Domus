@@ -6,6 +6,7 @@ import com.domus.application.chore.ListChoresUseCase
 import com.domus.core.chore.Chore
 import com.domus.core.chore.ChoreAlreadyExistsException
 import com.domus.core.chore.ChoreNotFoundException
+import com.domus.core.chore.Schedule
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import java.time.LocalDate
@@ -42,18 +43,39 @@ class ChoreWebController(
     fun addChore(
         @RequestParam name: String,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dueDate: LocalDate,
+        @RequestParam scheduleType: String,
+        @RequestParam(required = false) days: String?,
         model: Model,
     ): String {
-        val chore = Chore(name = name, dueDate = dueDate)
+        if (name.isBlank()) {
+            model.addAttribute("error", "Name is required")
+            model.addAttribute("chores", listChoresUseCase.getChores())
+            return "index :: chore-list"
+        }
+        val schedule = when (scheduleType) {
+            "one_time" -> Schedule.OneTime
+            "every_n_days" -> {
+                val daysInt = days?.toIntOrNull()
+                if (daysInt == null || daysInt <= 0) {
+                    model.addAttribute("error", "Days must be a positive number")
+                    model.addAttribute("chores", listChoresUseCase.getChores())
+                    return "index :: chore-list"
+                }
+                Schedule.EveryNDays(daysInt)
+            }
+            else -> throw IllegalArgumentException("Unknown schedule type: $scheduleType")
+        }
+        val chore = Chore(name = name, dueDate = dueDate, schedule = schedule)
         createChoreUseCase.addChore(chore)
         model.addAttribute("chores", listChoresUseCase.getChores())
         return "index :: chore-list"
     }
 
     @DeleteMapping("/chores/{name}")
-    fun deleteChore(@PathVariable name: String): ResponseEntity<Unit> {
+    fun deleteChore(@PathVariable name: String, model: Model): String {
         deleteChoreUseCase.deleteChore(name)
-        return ResponseEntity.ok().build()
+        model.addAttribute("chores", listChoresUseCase.getChores())
+        return "index :: chore-list"
     }
 
     @ExceptionHandler(ChoreAlreadyExistsException::class)
