@@ -4,6 +4,6 @@ import java.time.LocalDate
 
 data class Chore(
     val name: String,
-    val dueDate: LocalDate = LocalDate.now(),
+    val dueDate: LocalDate,
     val schedule: Schedule = Schedule.OneTime,
 )

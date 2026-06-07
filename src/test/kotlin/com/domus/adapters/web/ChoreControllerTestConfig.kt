@@ -3,6 +3,7 @@ package com.domus.adapters.web
 import com.domus.application.chore.CreateChoreUseCase
 import com.domus.application.chore.DeleteChoreUseCase
 import com.domus.application.chore.ListChoresUseCase
+import com.domus.createChore
 import com.domus.core.chore.Chore
 import com.domus.core.chore.ChoreRepository
 import org.springframework.boot.test.context.TestConfiguration
@@ -34,7 +35,7 @@ class FakeChoreRepository : ChoreRepository {
 
     fun reset() {
         chores.clear()
-        chores.add(Chore(name = "Placeholder chore"))
+        chores.add(createChore("Placeholder chore"))
     }
 
     override fun findAll(): List<Chore> = chores.toList()
