@@ -1,11 +1,13 @@
 package com.domus.adapters.web
 
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -18,11 +20,19 @@ class ChoreControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
+    @Autowired
+    private lateinit var repository: FakeChoreRepository
+
+    @BeforeEach
+    fun setUp() {
+        repository.reset()
+    }
+
     @Test
     fun `getChores returns list of chores`() {
         mockMvc.perform(get("/api/chores"))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$[0].name").value("Placeholder chore"))
+            .andExpect(jsonPath("$[?(@.name=='Placeholder chore')]").exists())
     }
 
     @Test
@@ -43,5 +53,17 @@ class ChoreControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
             .andExpect(status().isConflict)
+    }
+
+    @Test
+    fun `deleteChore returns 200 when chore exists`() {
+        mockMvc.perform(delete("/api/chore/{name}", "Placeholder chore"))
+            .andExpect(status().isOk)
+    }
+
+    @Test
+    fun `deleteChore returns 404 when chore not found`() {
+        mockMvc.perform(delete("/api/chore/{name}", "Non-existent"))
+            .andExpect(status().isNotFound)
     }
 }
