@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chores</title>
+    <script src="https://unpkg.com/htmx.org@2"></script>
+</head>
+<body>
+<h1>Chores</h1>
+    <form hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
+          hx-on::after-request="this.reset()">
+        <input type="text" name="name" placeholder="New chore" required>
+        <button>Add</button>
+    </form>
+    <table>
+        <thead>
+        <tr><th>Name</th><th></th></tr>
+        </thead>
+        <tbody id="chore-list" th:fragment="chore-list">
+        <tr th:each="chore : ${chores}">
+            <td th:text="${chore.name}">name</td>
+            <td><button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="closest tr" hx-swap="outerHTML">Delete</button></td>
+        </tr>
+        </tbody>
+    </table>
+</body>
+</html>
