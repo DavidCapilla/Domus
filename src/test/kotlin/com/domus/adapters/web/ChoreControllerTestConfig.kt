@@ -34,4 +34,10 @@ class FakeChoreRepository : ChoreRepository {
         if (!alreadyExists) chores.add(chore)
         return !alreadyExists
     }
+
+    override fun delete(chore: Chore): Boolean {
+        val alreadyExists = chores.any { it == chore }
+        if (alreadyExists) chores.remove(chore)
+        return alreadyExists
+    }
 }

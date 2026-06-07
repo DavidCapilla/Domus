@@ -11,5 +11,8 @@ class InMemoryChoreRepository() : ChoreRepository {
     private val chores: MutableSet<Chore> = HashSet()
 
     override fun findAll() = chores.toList()
+
     override fun save(chore: Chore) = chores.add(chore)
+
+    override fun delete(chore: Chore) = chores.remove(chore)
 }
