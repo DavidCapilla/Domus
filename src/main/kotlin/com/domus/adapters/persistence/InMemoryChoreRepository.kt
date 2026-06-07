@@ -10,6 +10,8 @@ class InMemoryChoreRepository() : ChoreRepository {
 
     private val chores: MutableSet<Chore> = HashSet()
 
+    override fun findByName(name: String) = chores.find { it.name == name }
+
     override fun findAll() = chores.toList()
 
     override fun save(chore: Chore) = chores.add(chore)
