@@ -44,7 +44,7 @@ class ChoreIntegrationTest {
     @Test
     fun `addChore returns 200 for new chore`() {
         val response =
-            restTemplate.postForEntity("/api/chore", Chore(name = "New chore"), String::class.java)
+            restTemplate.postForEntity("/api/chores", Chore(name = "New chore"), String::class.java)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
     }
@@ -52,7 +52,7 @@ class ChoreIntegrationTest {
     @Test
     fun `addChore returns 409 for duplicate chore`() {
         val response = restTemplate.postForEntity(
-            "/api/chore",
+            "/api/chores",
             Chore(name = "Clean kitchen"),
             String::class.java
         )
@@ -63,7 +63,7 @@ class ChoreIntegrationTest {
     @Test
     fun `deleteChore returns 200 when chore exists`() {
         val response = restTemplate.exchange(
-            "/api/chore/{name}",
+            "/api/chores/{name}",
             HttpMethod.DELETE,
             null,
             String::class.java,
@@ -76,7 +76,7 @@ class ChoreIntegrationTest {
     @Test
     fun `deleteChore returns 404 when chore not found`() {
         val response = restTemplate.exchange(
-            "/api/chore/{name}",
+            "/api/chores/{name}",
             HttpMethod.DELETE,
             null,
             String::class.java,

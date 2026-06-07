@@ -30,12 +30,12 @@ class ChoreController(
         return listChoresUseCase.getChores()
     }
 
-    @PostMapping("/chore")
+    @PostMapping("/chores")
     fun addChore(@RequestBody chore: Chore) {
         createChoreUseCase.addChore(chore)
     }
 
-    @DeleteMapping("/chore/{name}")
+    @DeleteMapping("/chores/{name}")
     fun deleteChore(@PathVariable name: String) {
         deleteChoreUseCase.deleteChore(name)
     }
