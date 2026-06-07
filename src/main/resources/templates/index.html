@@ -15,13 +15,14 @@
             <option value="one_time">One time</option>
             <option value="every_n_days">Every N days</option>
         </select>
-        <input type="number" name="days" id="days-field" style="display:none" placeholder="Every (days)" min="1" disabled>
+        <input type="number" name="days" id="days-field" style="display:none" placeholder="Every (days)" min="1" disabled required>
         <script>
             function toggleDaysField() {
                 var field = document.getElementById('days-field');
                 var visible = document.getElementById('scheduleType').value === 'every_n_days';
                 field.style.display = visible ? '' : 'none';
                 field.disabled = !visible;
+                field.required = visible;
             }
         </script>
         <button>Add</button>
