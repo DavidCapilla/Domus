@@ -1,10 +1,9 @@
 package com.domus.application.chore
 
-import com.domus.core.chore.Chore
 import com.domus.core.chore.ChoreNotFoundException
 import com.domus.core.chore.ChoreRepository
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -18,24 +17,13 @@ class DeleteChoreUseCaseTest {
 
     @Test
     fun `deleteChore deletes existing chore`() {
-        val chore = mock<Chore>()
-        whenever(repository.findByName("Change Towels")).doReturn(chore)
-        whenever(repository.delete(chore)).doReturn(true)
+        whenever(repository.delete("Clean kitchen")).doReturn(true)
         useCase.deleteChore("Clean kitchen")
-        verify(repository).delete(chore)
+        verify(repository).delete("Clean kitchen")
     }
 
     @Test
     fun `deleteChore throws when chore not found`() {
-        whenever(repository.findByName("Change Towels")).doReturn(null)
-        whenever(repository.delete(any())).doReturn(true)
-        assertThrows(ChoreNotFoundException::class.java) { useCase.deleteChore("Clean kitchen") }
-    }
-
-    @Test
-    fun `deleteChore throws when delete goes wrong not found`() {
-        val chore = mock<Chore>()
-        whenever(repository.findByName("Change Towels")).doReturn(chore)
         whenever(repository.delete(any())).doReturn(false)
         assertThrows(ChoreNotFoundException::class.java) { useCase.deleteChore("Clean kitchen") }
     }
