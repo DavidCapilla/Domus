@@ -8,20 +8,39 @@
 <body>
 <h1>Chores</h1>
     <form hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
-          hx-on::after-request="this.reset()">
+          hx-on::after-request="this.reset(); toggleDaysField()">
         <input type="text" name="name" placeholder="New chore" required>
         <input type="date" name="dueDate" required>
+        <select name="scheduleType" id="scheduleType" onchange="toggleDaysField()">
+            <option value="one_time">One time</option>
+            <option value="every_n_days">Every N days</option>
+        </select>
+        <input type="number" name="days" id="days-field" style="display:none" placeholder="Every (days)" min="1" disabled required>
+        <script>
+            function toggleDaysField() {
+                var field = document.getElementById('days-field');
+                var visible = document.getElementById('scheduleType').value === 'every_n_days';
+                field.style.display = visible ? '' : 'none';
+                field.disabled = !visible;
+                field.required = visible;
+            }
+        </script>
         <button>Add</button>
     </form>
     <table>
         <thead>
-        <tr><th>Name</th><th>Due date</th><th></th></tr>
+        <tr><th>Name</th><th>Due date</th><th>Schedule</th><th></th></tr>
         </thead>
         <tbody id="chore-list" th:fragment="chore-list">
+        <tr th:if="${error}" th:replace="~{::error-row}"></tr>
+        <tr th:remove="all" th:fragment="error-row">
+            <td colspan="4" th:text="${error}" style="color:red">error</td>
+        </tr>
         <tr th:each="chore : ${chores}">
             <td th:text="${chore.name}">name</td>
             <td th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</td>
-            <td><button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="closest tr" hx-swap="outerHTML">Delete</button></td>
+            <td th:text="${chore.schedule}">schedule</td>
+            <td><button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML">Delete</button></td>
         </tr>
         </tbody>
     </table>

@@ -1,6 +1,6 @@
 package com.domus.application.chore
 
-import com.domus.core.chore.Chore
+import com.domus.createChore
 import com.domus.core.chore.ChoreRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -12,13 +12,13 @@ import org.mockito.kotlin.whenever
 class ListChoresUseCaseTest {
 
     private val repository = mock<ChoreRepository> {
-        on { findAll() } doReturn listOf(Chore(name = "Clean kitchen"), Chore(name = "Do laundry"))
+        on { findAll() } doReturn listOf(createChore("Clean kitchen"), createChore("Do laundry"))
     }
     private val useCase = ListChoresUseCase(repository)
 
     @Test
     fun `getChores returns chores from repository`() {
-        val expected = listOf(Chore(name = "Clean kitchen"), Chore(name = "Do laundry"))
+        val expected = listOf(createChore("Clean kitchen"), createChore("Do laundry"))
         val result = useCase.getChores()
         assertEquals(expected, result)
     }
