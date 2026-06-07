@@ -8,9 +8,10 @@ import org.springframework.stereotype.Service
 @Service
 class DeleteChoreUseCase(val choreRepository: ChoreRepository) {
 
-     fun deleteChore(choreName: String) {
-         if (!choreRepository.delete(Chore(choreName))) {
-             throw ChoreNotFoundException(choreName)
-         }
-     }
+    fun deleteChore(choreName: String) {
+        val chore = choreRepository.findByName(choreName) ?: throw ChoreNotFoundException(choreName)
+        if (!choreRepository.delete(chore)) {
+            throw ChoreNotFoundException(choreName)
+        }
+    }
 }

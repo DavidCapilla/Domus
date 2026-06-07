@@ -18,13 +18,24 @@ class DeleteChoreUseCaseTest {
 
     @Test
     fun `deleteChore deletes existing chore`() {
-        whenever(repository.delete(any())).doReturn(true)
+        val chore = mock<Chore>()
+        whenever(repository.findByName("Change Towels")).doReturn(chore)
+        whenever(repository.delete(chore)).doReturn(true)
         useCase.deleteChore("Clean kitchen")
-        verify(repository).delete(Chore(name = "Clean kitchen"))
+        verify(repository).delete(chore)
     }
 
     @Test
     fun `deleteChore throws when chore not found`() {
+        whenever(repository.findByName("Change Towels")).doReturn(null)
+        whenever(repository.delete(any())).doReturn(true)
+        assertThrows(ChoreNotFoundException::class.java) { useCase.deleteChore("Clean kitchen") }
+    }
+
+    @Test
+    fun `deleteChore throws when delete goes wrong not found`() {
+        val chore = mock<Chore>()
+        whenever(repository.findByName("Change Towels")).doReturn(chore)
         whenever(repository.delete(any())).doReturn(false)
         assertThrows(ChoreNotFoundException::class.java) { useCase.deleteChore("Clean kitchen") }
     }
