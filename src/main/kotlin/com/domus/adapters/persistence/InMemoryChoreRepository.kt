@@ -14,5 +14,5 @@ class InMemoryChoreRepository() : ChoreRepository {
 
     override fun save(chore: Chore) = chores.add(chore)
 
-    override fun delete(chore: Chore) = chores.remove(chore)
+    override fun delete(choreName: String) = chores.removeIf { it.name == choreName }
 }
