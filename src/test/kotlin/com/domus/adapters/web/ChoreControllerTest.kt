@@ -40,7 +40,7 @@ class ChoreControllerTest {
         val json = """{"name":"New chore"}"""
 
         mockMvc.perform(
-            post("/api/chore")
+            post("/api/chores")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         )
@@ -52,7 +52,7 @@ class ChoreControllerTest {
         val json = """{"name":"Placeholder chore"}"""
 
         mockMvc.perform(
-            post("/api/chore")
+            post("/api/chores")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         )
@@ -61,13 +61,13 @@ class ChoreControllerTest {
 
     @Test
     fun `deleteChore returns 200 when chore exists`() {
-        mockMvc.perform(delete("/api/chore/{name}", "Placeholder chore"))
+        mockMvc.perform(delete("/api/chores/{name}", "Placeholder chore"))
             .andExpect(status().isOk)
     }
 
     @Test
     fun `deleteChore returns 404 when chore not found`() {
-        mockMvc.perform(delete("/api/chore/{name}", "Non-existent"))
+        mockMvc.perform(delete("/api/chores/{name}", "Non-existent"))
             .andExpect(status().isNotFound)
     }
 }
