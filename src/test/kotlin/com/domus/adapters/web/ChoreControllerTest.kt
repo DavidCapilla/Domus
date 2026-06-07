@@ -39,9 +39,11 @@ class ChoreControllerTest {
     fun `addChore returns 200 for new chore`() {
         val json = """{"name":"New chore"}"""
 
-        mockMvc.perform(post("/api/chore")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+        mockMvc.perform(
+            post("/api/chore")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        )
             .andExpect(status().isOk)
     }
 
@@ -49,9 +51,11 @@ class ChoreControllerTest {
     fun `addChore returns 409 for duplicate chore`() {
         val json = """{"name":"Placeholder chore"}"""
 
-        mockMvc.perform(post("/api/chore")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+        mockMvc.perform(
+            post("/api/chore")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        )
             .andExpect(status().isConflict)
     }
 
