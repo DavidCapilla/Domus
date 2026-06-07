@@ -1,6 +1,7 @@
 package com.domus
 
 import com.domus.adapters.persistence.InMemoryChoreRepository
+import com.domus.adapters.web.dto.ChoreResponse
 import com.domus.core.chore.Chore
 import com.domus.core.chore.ChoreRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -13,8 +14,11 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ChoreIntegrationTest {
@@ -34,7 +38,7 @@ class ChoreIntegrationTest {
 
     @Test
     fun `getChores returns 200 and list with seeded chores`() {
-        val response = restTemplate.getForEntity("/api/chores", Array<Chore>::class.java)
+        val response = restTemplate.getForEntity("/api/chores", Array<ChoreResponse>::class.java)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body!!.map { it.name })
@@ -43,18 +47,27 @@ class ChoreIntegrationTest {
 
     @Test
     fun `addChore returns 200 for new chore`() {
-        val response =
-            restTemplate.postForEntity("/api/chores", Chore(name = "New chore"), String::class.java)
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+        }
+        val response = restTemplate.postForEntity(
+            "/api/chores",
+            HttpEntity("""{"name":"New chore"}""", headers),
+            String::class.java,
+        )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
     }
 
     @Test
     fun `addChore returns 409 for duplicate chore`() {
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+        }
         val response = restTemplate.postForEntity(
             "/api/chores",
-            Chore(name = "Clean kitchen"),
-            String::class.java
+            HttpEntity("""{"name":"Clean kitchen"}""", headers),
+            String::class.java,
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.CONFLICT)

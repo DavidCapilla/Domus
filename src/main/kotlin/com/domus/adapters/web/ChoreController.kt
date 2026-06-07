@@ -1,9 +1,10 @@
 package com.domus.adapters.web
 
+import com.domus.adapters.web.dto.ChoreRequest
+import com.domus.adapters.web.dto.ChoreResponse
 import com.domus.application.chore.CreateChoreUseCase
 import com.domus.application.chore.DeleteChoreUseCase
 import com.domus.application.chore.ListChoresUseCase
-import com.domus.core.chore.Chore
 import com.domus.core.chore.ChoreAlreadyExistsException
 import com.domus.core.chore.ChoreNotFoundException
 import org.springframework.http.HttpStatus
@@ -26,13 +27,13 @@ class ChoreController(
 ) {
 
     @GetMapping("/chores")
-    fun getChores(): List<Chore> {
-        return listChoresUseCase.getChores()
+    fun getChores(): List<ChoreResponse> {
+        return listChoresUseCase.getChores().map(ChoreResponse::fromDomain)
     }
 
     @PostMapping("/chores")
-    fun addChore(@RequestBody chore: Chore) {
-        createChoreUseCase.addChore(chore)
+    fun addChore(@RequestBody request: ChoreRequest) {
+        createChoreUseCase.addChore(request.toDomain())
     }
 
     @DeleteMapping("/chores/{name}")
