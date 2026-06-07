@@ -6,7 +6,9 @@ import com.domus.application.chore.ListChoresUseCase
 import com.domus.core.chore.Chore
 import com.domus.core.chore.ChoreAlreadyExistsException
 import com.domus.core.chore.ChoreNotFoundException
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
+import java.time.LocalDate
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -37,8 +39,12 @@ class ChoreWebController(
     }
 
     @PostMapping("/chores")
-    fun addChore(@RequestParam name: String, model: Model): String {
-        val chore = Chore(name)
+    fun addChore(
+        @RequestParam name: String,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dueDate: LocalDate,
+        model: Model,
+    ): String {
+        val chore = Chore(name = name, dueDate = dueDate)
         createChoreUseCase.addChore(chore)
         model.addAttribute("chores", listChoresUseCase.getChores())
         return "index :: chore-list"
