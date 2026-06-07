@@ -1,0 +1,60 @@
+package com.domus.adapters.web
+
+import com.domus.application.chore.CreateChoreUseCase
+import com.domus.application.chore.DeleteChoreUseCase
+import com.domus.application.chore.ListChoresUseCase
+import com.domus.core.chore.Chore
+import com.domus.core.chore.ChoreAlreadyExistsException
+import com.domus.core.chore.ChoreNotFoundException
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
+
+@Controller
+class ChoreWebController(
+    private val listChoresUseCase: ListChoresUseCase,
+    private val createChoreUseCase: CreateChoreUseCase,
+    private val deleteChoreUseCase: DeleteChoreUseCase,
+) {
+
+    @GetMapping("/")
+    fun index(model: Model): String {
+        model.addAttribute("chores", listChoresUseCase.getChores())
+        return "index"
+    }
+
+    @GetMapping("/chores")
+    fun getChores(model: Model): String {
+        model.addAttribute("chores", listChoresUseCase.getChores())
+        return "index :: chore-list"
+    }
+
+    @PostMapping("/chores")
+    fun addChore(@RequestParam name: String, model: Model): String {
+        val chore = Chore(name)
+        createChoreUseCase.addChore(chore)
+        model.addAttribute("chores", listChoresUseCase.getChores())
+        return "index :: chore-list"
+    }
+
+    @DeleteMapping("/chores/{name}")
+    fun deleteChore(@PathVariable name: String): ResponseEntity<Unit> {
+        deleteChoreUseCase.deleteChore(name)
+        return ResponseEntity.ok().build()
+    }
+
+    @ExceptionHandler(ChoreAlreadyExistsException::class)
+    fun handleChoreAlreadyExists(): ResponseEntity<String> =
+        ResponseEntity("Chore already exists", HttpStatus.CONFLICT)
+
+    @ExceptionHandler(ChoreNotFoundException::class)
+    fun handleChoreNotFound(): ResponseEntity<String> =
+        ResponseEntity("Chore not found", HttpStatus.NOT_FOUND)
+}
