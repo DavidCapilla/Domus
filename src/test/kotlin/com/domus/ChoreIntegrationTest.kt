@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ChoreIntegrationTest {
@@ -45,9 +46,10 @@ class ChoreIntegrationTest {
         val headers = HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
         }
+        val today = LocalDate.now().toString()
         val response = restTemplate.postForEntity(
             "/api/chores",
-            HttpEntity("""{"name":"New chore"}""", headers),
+            HttpEntity("""{"name":"New chore","dueDate":"$today"}""", headers),
             String::class.java,
         )
 
@@ -59,9 +61,10 @@ class ChoreIntegrationTest {
         val headers = HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
         }
+        val today = LocalDate.now().toString()
         val response = restTemplate.postForEntity(
             "/api/chores",
-            HttpEntity("""{"name":"Clean kitchen"}""", headers),
+            HttpEntity("""{"name":"Clean kitchen","dueDate":"$today"}""", headers),
             String::class.java,
         )
 
