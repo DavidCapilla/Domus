@@ -1,11 +1,11 @@
 package com.domus.core.chore
 
+import com.domus.createChore
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
 
 abstract class ChoreRepositoryContract {
 
@@ -18,8 +18,8 @@ abstract class ChoreRepositoryContract {
 
     @Test
     fun `findAll returns all saved chores`() {
-        assertTrue(repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now().plusDays(2), Schedule.OneTime)))
-        assertTrue(repository.save(Chore(UUID.randomUUID(), "Do laundry", LocalDate.now().plusDays(5), Schedule.OneTime)))
+        assertTrue(repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(2))))
+        assertTrue(repository.save(createChore(name = "Do laundry", dueDate = LocalDate.now().plusDays(5))))
 
         val result = repository.findAll()
 
@@ -30,15 +30,15 @@ abstract class ChoreRepositoryContract {
 
     @Test
     fun `duplicated chore by name is rejected even with different fields`() {
-        assertTrue(repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.parse("2026-01-01"), Schedule.OneTime)))
-        assertFalse(repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.parse("2026-06-06"), Schedule.OneTime)))
+        assertTrue(repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-01-01"))))
+        assertFalse(repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-06-06"))))
 
         assertEquals(1, repository.findAll().size)
     }
 
     @Test
     fun `duplicated chores are not saved`() {
-        val chore = Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now().plusDays(3), Schedule.OneTime)
+        val chore = createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(3))
         assertTrue(repository.save(chore))
         assertFalse(repository.save(chore))
 
@@ -47,7 +47,7 @@ abstract class ChoreRepositoryContract {
 
     @Test
     fun `delete removes existing chore`() {
-        repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now().plusWeeks(1), Schedule.OneTime))
+        repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusWeeks(1)))
 
         assertTrue(repository.delete("Clean kitchen"))
         assertTrue(repository.findAll().isEmpty())
@@ -60,8 +60,8 @@ abstract class ChoreRepositoryContract {
 
     @Test
     fun `delete removes only the specified chore`() {
-        repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now().plusDays(7), Schedule.OneTime))
-        repository.save(Chore(UUID.randomUUID(), "Do laundry", LocalDate.now().plusDays(14), Schedule.OneTime))
+        repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(7)))
+        repository.save(createChore(name = "Do laundry", dueDate = LocalDate.now().plusDays(14)))
 
         assertTrue(repository.delete("Clean kitchen"))
 
