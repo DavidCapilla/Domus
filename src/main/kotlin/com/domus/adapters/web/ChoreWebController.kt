@@ -65,8 +65,7 @@ class ChoreWebController(
             }
             else -> throw IllegalArgumentException("Unknown schedule type: $scheduleType")
         }
-        val chore = Chore(name = name, dueDate = dueDate, schedule = schedule)
-        createChoreUseCase.addChore(chore)
+        createChoreUseCase.addChore(name = name, dueDate = dueDate, schedule = schedule)
         model.addAttribute("chores", listChoresUseCase.getChores())
         return "index :: chore-list"
     }
