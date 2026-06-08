@@ -18,8 +18,8 @@ abstract class ChoreRepositoryContract {
 
     @Test
     fun `findAll returns all saved chores`() {
-        assertTrue(repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now(), Schedule.OneTime)))
-        assertTrue(repository.save(Chore(UUID.randomUUID(), "Do laundry", LocalDate.now(), Schedule.OneTime)))
+        assertTrue(repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now().plusDays(2), Schedule.OneTime)))
+        assertTrue(repository.save(Chore(UUID.randomUUID(), "Do laundry", LocalDate.now().plusDays(5), Schedule.OneTime)))
 
         val result = repository.findAll()
 
@@ -38,7 +38,7 @@ abstract class ChoreRepositoryContract {
 
     @Test
     fun `duplicated chores are not saved`() {
-        val chore = Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now(), Schedule.OneTime)
+        val chore = Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now().plusDays(3), Schedule.OneTime)
         assertTrue(repository.save(chore))
         assertFalse(repository.save(chore))
 
@@ -47,7 +47,7 @@ abstract class ChoreRepositoryContract {
 
     @Test
     fun `delete removes existing chore`() {
-        repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now(), Schedule.OneTime))
+        repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now().plusWeeks(1), Schedule.OneTime))
 
         assertTrue(repository.delete("Clean kitchen"))
         assertTrue(repository.findAll().isEmpty())
@@ -60,8 +60,8 @@ abstract class ChoreRepositoryContract {
 
     @Test
     fun `delete removes only the specified chore`() {
-        repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now(), Schedule.OneTime))
-        repository.save(Chore(UUID.randomUUID(), "Do laundry", LocalDate.now(), Schedule.OneTime))
+        repository.save(Chore(UUID.randomUUID(), "Clean kitchen", LocalDate.now().plusDays(7), Schedule.OneTime))
+        repository.save(Chore(UUID.randomUUID(), "Do laundry", LocalDate.now().plusDays(14), Schedule.OneTime))
 
         assertTrue(repository.delete("Clean kitchen"))
 

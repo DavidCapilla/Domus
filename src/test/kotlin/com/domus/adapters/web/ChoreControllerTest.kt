@@ -38,8 +38,8 @@ class ChoreControllerTest {
 
     @Test
     fun `addChore returns 200 for new chore`() {
-        val today = LocalDate.now().toString()
-        val json = """{"name":"New chore","dueDate":"$today"}"""
+        val dueDate = LocalDate.now().plusDays(14).toString()
+        val json = """{"name":"New chore","dueDate":"$dueDate"}"""
 
         mockMvc.perform(
             post("/api/chores")
@@ -51,8 +51,8 @@ class ChoreControllerTest {
 
     @Test
     fun `addChore returns 409 for duplicate chore`() {
-        val today = LocalDate.now().toString()
-        val json = """{"name":"Placeholder chore","dueDate":"$today"}"""
+        val dueDate = LocalDate.now().plusDays(21).toString()
+        val json = """{"name":"Placeholder chore","dueDate":"$dueDate"}"""
 
         mockMvc.perform(
             post("/api/chores")
