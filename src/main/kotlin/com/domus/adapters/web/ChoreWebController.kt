@@ -1,5 +1,6 @@
 package com.domus.adapters.web
 
+import com.domus.application.chore.CompleteChoreUseCase
 import com.domus.application.chore.CreateChoreUseCase
 import com.domus.application.chore.DeleteChoreUseCase
 import com.domus.application.chore.ListChoresUseCase
@@ -26,6 +27,7 @@ class ChoreWebController(
     private val listChoresUseCase: ListChoresUseCase,
     private val createChoreUseCase: CreateChoreUseCase,
     private val updateChoreUseCase: UpdateChoreUseCase,
+    private val completeChoreUseCase: CompleteChoreUseCase,
     private val deleteChoreUseCase: DeleteChoreUseCase,
 ) {
 
@@ -115,6 +117,13 @@ class ChoreWebController(
             dueDate = dueDate,
             schedule = schedule
         )
+        model.addAttribute("chores", listChoresUseCase.getChores())
+        return "index :: chore-list"
+    }
+
+    @PostMapping("/chores/{name}/complete")
+    fun completeChore(@PathVariable name: String, model: Model): String {
+        completeChoreUseCase.completeChore(name)
         model.addAttribute("chores", listChoresUseCase.getChores())
         return "index :: chore-list"
     }
