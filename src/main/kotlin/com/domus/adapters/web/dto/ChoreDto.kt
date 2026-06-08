@@ -28,19 +28,13 @@ fun Schedule.toDto() = when (this) {
 
 data class ChoreRequest(
     val name: String,
-    val dueDate: LocalDate? = null,
+    val dueDate: LocalDate,
     val schedule: ScheduleDto = ScheduleDto.OneTime,
-) {
-    fun toDomain() = Chore(
-        name = name,
-        dueDate = dueDate ?: LocalDate.now(),
-        schedule = schedule.toDomain(),
-    )
-}
+)
 
 data class ChoreResponse(
     val name: String,
-    val dueDate: LocalDate?,
+    val dueDate: LocalDate,
     val schedule: ScheduleDto?,
 ) {
     companion object {

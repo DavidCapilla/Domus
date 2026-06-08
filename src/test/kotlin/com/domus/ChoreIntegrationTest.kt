@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ChoreIntegrationTest {
@@ -27,8 +28,8 @@ class ChoreIntegrationTest {
     @BeforeEach
     fun setUp() {
         repository.findAll().forEach { repository.delete(it.name) }
-        repository.save(createChore("Clean kitchen"))
-        repository.save(createChore("Do laundry"))
+        repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(5)))
+        repository.save(createChore(name = "Do laundry", dueDate = LocalDate.now().plusDays(10)))
     }
 
     @Test
@@ -45,9 +46,10 @@ class ChoreIntegrationTest {
         val headers = HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
         }
+        val dueDate = LocalDate.now().plusDays(30).toString()
         val response = restTemplate.postForEntity(
             "/api/chores",
-            HttpEntity("""{"name":"New chore"}""", headers),
+            HttpEntity("""{"name":"New chore","dueDate":"$dueDate"}""", headers),
             String::class.java,
         )
 
@@ -59,9 +61,10 @@ class ChoreIntegrationTest {
         val headers = HttpHeaders().apply {
             contentType = MediaType.APPLICATION_JSON
         }
+        val dueDate = LocalDate.now().plusDays(5).toString()
         val response = restTemplate.postForEntity(
             "/api/chores",
-            HttpEntity("""{"name":"Clean kitchen"}""", headers),
+            HttpEntity("""{"name":"Clean kitchen","dueDate":"$dueDate"}""", headers),
             String::class.java,
         )
 

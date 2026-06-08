@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
 
 @WebMvcTest(ChoreController::class)
 @Import(ChoreControllerTestConfig::class)
@@ -37,7 +38,8 @@ class ChoreControllerTest {
 
     @Test
     fun `addChore returns 200 for new chore`() {
-        val json = """{"name":"New chore"}"""
+        val dueDate = LocalDate.now().plusDays(14).toString()
+        val json = """{"name":"New chore","dueDate":"$dueDate"}"""
 
         mockMvc.perform(
             post("/api/chores")
@@ -49,7 +51,8 @@ class ChoreControllerTest {
 
     @Test
     fun `addChore returns 409 for duplicate chore`() {
-        val json = """{"name":"Placeholder chore"}"""
+        val dueDate = LocalDate.now().plusDays(21).toString()
+        val json = """{"name":"Placeholder chore","dueDate":"$dueDate"}"""
 
         mockMvc.perform(
             post("/api/chores")
