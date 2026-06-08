@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDate
@@ -60,6 +61,33 @@ class ChoreControllerTest {
                 .content(json)
         )
             .andExpect(status().isConflict)
+    }
+
+    @Test
+    fun `updateChore returns 200 for existing chore`() {
+        val dueDate = LocalDate.now().plusDays(7).toString()
+        val json = """{"name":"Placeholder chore","dueDate":"$dueDate"}"""
+
+        mockMvc.perform(
+            put("/api/chores/{name}", "Placeholder chore")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.name").value("Placeholder chore"))
+    }
+
+    @Test
+    fun `updateChore returns 404 for non-existent chore`() {
+        val dueDate = LocalDate.now().plusDays(7).toString()
+        val json = """{"name":"Anything","dueDate":"$dueDate"}"""
+
+        mockMvc.perform(
+            put("/api/chores/{name}", "Non-existent")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        )
+            .andExpect(status().isNotFound)
     }
 
     @Test
