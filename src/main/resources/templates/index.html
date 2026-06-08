@@ -42,6 +42,7 @@
             <td th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</td>
             <td th:text="${chore.schedule}">schedule</td>
             <td>
+                <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML">Complete</button>
                 <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML">Edit</button>
                 <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML">Delete</button>
             </td>

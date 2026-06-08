@@ -38,6 +38,18 @@ class ChoreControllerTest {
     }
 
     @Test
+    fun `completeChore returns 200 for existing chore`() {
+        mockMvc.perform(post("/api/chores/{name}/complete", "Placeholder chore"))
+            .andExpect(status().isOk)
+    }
+
+    @Test
+    fun `completeChore returns 404 for non-existent chore`() {
+        mockMvc.perform(post("/api/chores/{name}/complete", "Non-existent"))
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
     fun `addChore returns 200 for new chore`() {
         val dueDate = LocalDate.now().plusDays(14).toString()
         val json = """{"name":"New chore","dueDate":"$dueDate"}"""

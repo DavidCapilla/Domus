@@ -3,6 +3,7 @@ package com.domus.adapters.web
 import com.domus.adapters.web.dto.ChoreRequest
 import com.domus.adapters.web.dto.ChoreResponse
 import com.domus.adapters.web.dto.toDomain
+import com.domus.application.chore.CompleteChoreUseCase
 import com.domus.application.chore.CreateChoreUseCase
 import com.domus.application.chore.DeleteChoreUseCase
 import com.domus.application.chore.ListChoresUseCase
@@ -27,6 +28,7 @@ class ChoreController(
     private val listChoresUseCase: ListChoresUseCase,
     private val createChoreUseCase: CreateChoreUseCase,
     private val updateChoreUseCase: UpdateChoreUseCase,
+    private val completeChoreUseCase: CompleteChoreUseCase,
     private val deleteChoreUseCase: DeleteChoreUseCase,
 ) {
 
@@ -42,6 +44,11 @@ class ChoreController(
             dueDate = request.dueDate,
             schedule = request.schedule.toDomain(),
         )
+    }
+
+    @PostMapping("/chores/{name}/complete")
+    fun completeChore(@PathVariable name: String) {
+        completeChoreUseCase.completeChore(name)
     }
 
     @PutMapping("/chores/{name}")

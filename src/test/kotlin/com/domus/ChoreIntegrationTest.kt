@@ -2,6 +2,7 @@ package com.domus
 
 import com.domus.adapters.persistence.InMemoryChoreRepository
 import com.domus.adapters.web.dto.ChoreResponse
+import com.domus.core.chore.Schedule
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -100,6 +101,53 @@ class ChoreIntegrationTest {
             "/api/chores/{name}",
             HttpMethod.PUT,
             HttpEntity("""{"name":"Anything","dueDate":"$dueDate"}""", headers),
+            String::class.java,
+            "Non-existent",
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `completeChore deletes one-time chore`() {
+        repository.save(createChore(name = "One-off task", schedule = Schedule.OneTime))
+
+        val response = restTemplate.exchange(
+            "/api/chores/{name}/complete",
+            HttpMethod.POST,
+            null,
+            String::class.java,
+            "One-off task",
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(repository.findByName("One-off task")).isNull()
+    }
+
+    @Test
+    fun `completeChore reschedules every-N-days chore`() {
+        repository.save(createChore(name = "Recurring task", schedule = Schedule.EveryNDays(7)))
+
+        val response = restTemplate.exchange(
+            "/api/chores/{name}/complete",
+            HttpMethod.POST,
+            null,
+            String::class.java,
+            "Recurring task",
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        val updated = repository.findByName("Recurring task")
+        assertThat(updated).isNotNull
+        assertThat(updated!!.dueDate).isEqualTo(LocalDate.now().plusDays(7))
+    }
+
+    @Test
+    fun `completeChore returns 404 for non-existent chore`() {
+        val response = restTemplate.exchange(
+            "/api/chores/{name}/complete",
+            HttpMethod.POST,
+            null,
             String::class.java,
             "Non-existent",
         )
