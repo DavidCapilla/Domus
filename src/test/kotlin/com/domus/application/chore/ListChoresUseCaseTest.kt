@@ -12,7 +12,10 @@ import org.mockito.kotlin.whenever
 class ListChoresUseCaseTest {
 
     private val repository = mock<ChoreRepository> {
-        on { findAll() } doReturn listOf(createChore("Clean kitchen"), createChore("Do laundry"))
+        on { findAll() } doReturn listOf(
+            createChore(name = "Clean kitchen"),
+            createChore(name = "Do laundry")
+        )
     }
     private val useCase = ListChoresUseCase(repository)
 
