@@ -18,8 +18,8 @@ class InMemoryChoreRepositoryTest {
 
     @Test
     fun `findAll returns all saved chores`() {
-        assertTrue(repository.save(createChore("Clean kitchen")))
-        assertTrue(repository.save(createChore("Do laundry")))
+        assertTrue(repository.save(createChore(name = "Clean kitchen")))
+        assertTrue(repository.save(createChore(name = "Do laundry")))
 
         val result = repository.findAll()
 
@@ -30,7 +30,7 @@ class InMemoryChoreRepositoryTest {
 
     @Test
     fun `duplicated chores are not saved`() {
-        val chore = createChore("Clean kitchen")
+        val chore = createChore(name = "Clean kitchen")
         assertTrue(repository.save(chore))
         assertFalse(repository.save(chore))
 
@@ -42,7 +42,7 @@ class InMemoryChoreRepositoryTest {
 
     @Test
     fun `delete removes existing chore`() {
-        repository.save(createChore("Clean kitchen"))
+        repository.save(createChore(name = "Clean kitchen"))
 
         assertTrue(repository.delete("Clean kitchen"))
         assertTrue(repository.findAll().isEmpty())
@@ -55,8 +55,8 @@ class InMemoryChoreRepositoryTest {
 
     @Test
     fun `delete removes only the specified chore`() {
-        repository.save(createChore("Clean kitchen"))
-        repository.save(createChore("Do laundry"))
+        repository.save(createChore(name = "Clean kitchen"))
+        repository.save(createChore(name = "Do laundry"))
 
         assertTrue(repository.delete("Clean kitchen"))
 

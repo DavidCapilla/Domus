@@ -27,8 +27,8 @@ class ChoreIntegrationTest {
     @BeforeEach
     fun setUp() {
         repository.findAll().forEach { repository.delete(it.name) }
-        repository.save(createChore("Clean kitchen"))
-        repository.save(createChore("Do laundry"))
+        repository.save(createChore(name = "Clean kitchen"))
+        repository.save(createChore(name = "Do laundry"))
     }
 
     @Test
