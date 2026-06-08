@@ -1,8 +1,8 @@
 package com.domus.application.chore
 
-import com.domus.createChore
 import com.domus.core.chore.ChoreAlreadyExistsException
 import com.domus.core.chore.ChoreRepository
+import com.domus.core.chore.Schedule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.mockito.kotlin.any
@@ -10,6 +10,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDate
 
 class CreateChoreUseCaseTest {
 
@@ -19,15 +20,15 @@ class CreateChoreUseCaseTest {
     @Test
     fun `addChore saves chore to repository when new`() {
         whenever(repository.save(any())).doReturn(true)
-        val chore = createChore("Take out trash")
-        useCase.addChore(chore)
-        verify(repository).save(chore)
+        useCase.addChore("Take out trash", LocalDate.now(), Schedule.OneTime)
+        verify(repository).save(any())
     }
 
     @Test
     fun `addChore throws when chore already exists`() {
         whenever(repository.save(any())).doReturn(false)
-        val chore = createChore("Clean kitchen")
-        assertThrows(ChoreAlreadyExistsException::class.java) { useCase.addChore(chore) }
+        assertThrows(ChoreAlreadyExistsException::class.java) {
+            useCase.addChore("Clean kitchen", LocalDate.now(), Schedule.OneTime)
+        }
     }
 }
