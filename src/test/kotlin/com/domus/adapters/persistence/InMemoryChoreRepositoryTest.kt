@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class InMemoryChoreRepositoryTest {
 
@@ -38,6 +39,14 @@ class InMemoryChoreRepositoryTest {
 
         assertEquals(1, result.size)
         assertTrue(result.any { it.name == "Clean kitchen" })
+    }
+
+    @Test
+    fun `duplicated chore by name is rejected even with different fields`() {
+        assertTrue(repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-01-01"))))
+        assertFalse(repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-06-06"))))
+
+        assertEquals(1, repository.findAll().size)
     }
 
     @Test
