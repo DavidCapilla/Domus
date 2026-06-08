@@ -12,7 +12,10 @@ class InMemoryChoreRepository() : ChoreRepository {
 
     override fun findAll() = chores.toList()
 
-    override fun save(chore: Chore) = chores.add(chore)
+    override fun save(chore: Chore): Boolean {
+        if (chores.any { it.name == chore.name }) return false
+        return chores.add(chore)
+    }
 
     override fun delete(choreName: String) = chores.removeIf { it.name == choreName }
 }
