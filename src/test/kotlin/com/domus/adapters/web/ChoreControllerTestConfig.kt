@@ -35,13 +35,13 @@ class FakeChoreRepository : ChoreRepository {
 
     fun reset() {
         chores.clear()
-        chores.add(createChore("Placeholder chore"))
+        chores.add(createChore(name = "Placeholder chore"))
     }
 
     override fun findAll(): List<Chore> = chores.toList()
 
     override fun save(chore: Chore): Boolean {
-        val alreadyExists = chores.any { it == chore }
+        val alreadyExists = chores.any { it.name == chore.name }
         if (!alreadyExists) chores.add(chore)
         return !alreadyExists
     }
