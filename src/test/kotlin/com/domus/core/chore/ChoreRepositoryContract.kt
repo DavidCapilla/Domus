@@ -46,6 +46,35 @@ abstract class ChoreRepositoryContract {
     }
 
     @Test
+    fun `findByName returns chore when it exists`() {
+        repository.save(createChore(name = "Clean kitchen"))
+        val found = repository.findByName("Clean kitchen")
+        assertTrue(found != null)
+        assertEquals("Clean kitchen", found!!.name)
+    }
+
+    @Test
+    fun `findByName returns null for non-existent chore`() {
+        assertTrue(repository.findByName("Non-existent") == null)
+    }
+
+    @Test
+    fun `update changes chore fields`() {
+        repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-01-01")))
+        assertTrue(repository.update("Clean kitchen", createChore(name = "Clean kitchen (updated)", dueDate = LocalDate.parse("2026-06-06"))))
+
+        assertTrue(repository.findByName("Clean kitchen") == null)
+        val updated = repository.findByName("Clean kitchen (updated)")
+        assertTrue(updated != null)
+        assertEquals(LocalDate.parse("2026-06-06"), updated!!.dueDate)
+    }
+
+    @Test
+    fun `update returns false for non-existent chore`() {
+        assertFalse(repository.update("Non-existent", createChore(name = "Anything")))
+    }
+
+    @Test
     fun `delete removes existing chore`() {
         repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusWeeks(1)))
 

@@ -72,6 +72,42 @@ class ChoreIntegrationTest {
     }
 
     @Test
+    fun `updateChore returns 200 and updates chore`() {
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+        }
+        val dueDate = LocalDate.now().plusDays(15).toString()
+        val response = restTemplate.exchange(
+            "/api/chores/{name}",
+            HttpMethod.PUT,
+            HttpEntity("""{"name":"Clean kitchen","dueDate":"$dueDate"}""", headers),
+            ChoreResponse::class.java,
+            "Clean kitchen",
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body!!.name).isEqualTo("Clean kitchen")
+        assertThat(response.body!!.dueDate.toString()).isEqualTo(dueDate)
+    }
+
+    @Test
+    fun `updateChore returns 404 for non-existent chore`() {
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+        }
+        val dueDate = LocalDate.now().plusDays(15).toString()
+        val response = restTemplate.exchange(
+            "/api/chores/{name}",
+            HttpMethod.PUT,
+            HttpEntity("""{"name":"Anything","dueDate":"$dueDate"}""", headers),
+            String::class.java,
+            "Non-existent",
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
     fun `deleteChore returns 200 when chore exists`() {
         val response = restTemplate.exchange(
             "/api/chores/{name}",

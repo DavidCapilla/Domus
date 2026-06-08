@@ -6,6 +6,7 @@ import com.domus.adapters.web.dto.toDomain
 import com.domus.application.chore.CreateChoreUseCase
 import com.domus.application.chore.DeleteChoreUseCase
 import com.domus.application.chore.ListChoresUseCase
+import com.domus.application.chore.UpdateChoreUseCase
 import com.domus.core.chore.ChoreAlreadyExistsException
 import com.domus.core.chore.ChoreNotFoundException
 import org.springframework.http.HttpStatus
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController
 class ChoreController(
     private val listChoresUseCase: ListChoresUseCase,
     private val createChoreUseCase: CreateChoreUseCase,
+    private val updateChoreUseCase: UpdateChoreUseCase,
     private val deleteChoreUseCase: DeleteChoreUseCase,
 ) {
 
@@ -38,6 +41,18 @@ class ChoreController(
             name = request.name,
             dueDate = request.dueDate,
             schedule = request.schedule.toDomain(),
+        )
+    }
+
+    @PutMapping("/chores/{name}")
+    fun updateChore(@PathVariable name: String, @RequestBody request: ChoreRequest): ChoreResponse {
+        return ChoreResponse.fromDomain(
+            updateChoreUseCase.updateChore(
+                currentName = name,
+                newName = request.name,
+                dueDate = request.dueDate,
+                schedule = request.schedule.toDomain(),
+            )
         )
     }
 
