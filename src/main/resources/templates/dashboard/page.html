@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chores Dashboard</title>
+    <script src="https://unpkg.com/htmx.org@2"></script>
+    <script>
+        function toggleDaysField(selectEl) {
+            var form = selectEl.closest('form');
+            var field = form.querySelector('[name="days"]');
+            var visible = selectEl.value === 'every_n_days';
+            field.style.display = visible ? '' : 'none';
+            field.disabled = !visible;
+            field.required = visible;
+        }
+    </script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        form { margin-bottom: 16px; }
+        form input, form select, form button { padding: 8px; margin-right: 8px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        .section { margin-bottom: 24px; }
+        .section h2 { font-size: 1.1em; margin: 0 0 8px; }
+        .empty { color: #888; font-style: italic; padding: 8px 0; }
+        .overdue td { color: #c00; }
+        .error { color: #c00; padding: 8px; }
+        .btn { padding: 4px 8px; cursor: pointer; }
+
+        @media (max-width: 600px) {
+            table { display: block; overflow-x: auto; white-space: nowrap; }
+            form input, form select { display: block; width: 100%; margin-bottom: 8px; box-sizing: border-box; }
+            form button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<h1>Chores Dashboard</h1>
+
+<form hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
+      hx-on::after-request="this.reset()">
+    <input type="text" name="name" placeholder="New chore" required>
+    <input type="date" name="dueDate" required>
+    <select name="scheduleType" onchange="toggleDaysField(this)">
+        <option value="one_time">One time</option>
+        <option value="every_n_days">Every N days</option>
+    </select>
+    <input type="number" name="days" style="display:none" placeholder="Every (days)" min="1" disabled required>
+    <button>Add</button>
+</form>
+
+<div id="chore-list" th:fragment="chore-list">
+    <div th:if="${error}" class="error" th:text="${error}">error</div>
+
+    <div class="section">
+        <h2>Overdue</h2>
+        <div th:if="${dashboard.overdue.isEmpty()}" class="empty">No overdue chores</div>
+        <table th:if="${!dashboard.overdue.isEmpty()}">
+            <thead><tr><th>Name</th><th>Due date</th><th>Schedule</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="chore : ${dashboard.overdue}" class="overdue">
+                <td th:text="${chore.name}">name</td>
+                <td th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</td>
+                <td th:text="${chore.schedule}">schedule</td>
+                <td>
+                    <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Complete</button>
+                    <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Edit</button>
+                    <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Delete</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Due Today</h2>
+        <div th:if="${dashboard.dueToday.isEmpty()}" class="empty">No chores due today</div>
+        <table th:if="${!dashboard.dueToday.isEmpty()}">
+            <thead><tr><th>Name</th><th>Due date</th><th>Schedule</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="chore : ${dashboard.dueToday}">
+                <td th:text="${chore.name}">name</td>
+                <td th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</td>
+                <td th:text="${chore.schedule}">schedule</td>
+                <td>
+                    <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Complete</button>
+                    <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Edit</button>
+                    <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Delete</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Upcoming</h2>
+        <div th:if="${dashboard.upcoming.isEmpty()}" class="empty">No upcoming chores</div>
+        <table th:if="${!dashboard.upcoming.isEmpty()}">
+            <thead><tr><th>Name</th><th>Due date</th><th>Schedule</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="chore : ${dashboard.upcoming}">
+                <td th:text="${chore.name}">name</td>
+                <td th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</td>
+                <td th:text="${chore.schedule}">schedule</td>
+                <td>
+                    <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Complete</button>
+                    <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Edit</button>
+                    <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Delete</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:remove="all">
+<div id="chore-list" th:fragment="chore-edit">
+    <div class="section">
+        <h2>Edit Chore</h2>
+        <form th:attr="hx-put=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML">
+            <input type="text" name="newName" th:value="${chore.name}" required>
+            <input type="date" name="dueDate" th:value="${chore.dueDate}" required>
+            <select name="scheduleType" onchange="toggleDaysField(this)">
+                <option value="one_time" th:selected="${chore.schedule.toString().startsWith('OneTime')}">One time</option>
+                <option value="every_n_days" th:selected="${chore.schedule.toString().startsWith('EveryNDays')}">Every N days</option>
+            </select>
+            <input type="number" name="days"
+                   th:style="${chore.schedule.toString().startsWith('OneTime')} ? 'display:none' : 'display:block'"
+                   placeholder="Every (days)" min="1"
+                   th:disabled="${chore.schedule.toString().startsWith('OneTime')}">
+            <button>Save</button>
+            <button type="button" hx-get="/chores" hx-target="#chore-list" hx-swap="outerHTML">Cancel</button>
+        </form>
+    </div>
+</div>
+</th:block>
+</body>
+</html>
