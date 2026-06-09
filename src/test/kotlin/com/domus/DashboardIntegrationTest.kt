@@ -25,7 +25,12 @@ class DashboardIntegrationTest {
     fun setUp() {
         repository.findAll().forEach { repository.delete(it.name) }
         repository.save(createChore(name = "Overdue chore", dueDate = LocalDate.now().minusDays(2)))
-        repository.save(createChore(name = "Another overdue chore", dueDate = LocalDate.now().minusDays(1)))
+        repository.save(
+            createChore(
+                name = "Another overdue chore",
+                dueDate = LocalDate.now().minusDays(1)
+            )
+        )
         repository.save(createChore(name = "Due today chore", dueDate = LocalDate.now()))
         repository.save(createChore(name = "Upcoming chore", dueDate = LocalDate.now().plusDays(3)))
     }
@@ -35,7 +40,10 @@ class DashboardIntegrationTest {
         val response = restTemplate.getForEntity("/api/dashboard", DashboardResponse::class.java)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body!!.overdue.map { it.name }).containsExactlyInAnyOrder("Overdue chore", "Another overdue chore")
+        assertThat(response.body!!.overdue.map { it.name }).containsExactlyInAnyOrder(
+            "Overdue chore",
+            "Another overdue chore"
+        )
         assertThat(response.body!!.dueToday.map { it.name }).containsExactly("Due today chore")
         assertThat(response.body!!.upcoming.map { it.name }).containsExactly("Upcoming chore")
     }
