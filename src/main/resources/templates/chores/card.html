@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div th:fragment="chore-card(chore)" class="card">
-    <div class="card-name" th:text="${chore.name}">name</div>
-    <div class="card-due" th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</div>
-    <div class="card-schedule" th:text="${chore.schedule}">schedule</div>
-    <div class="card-actions">
-        <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Complete</button>
-        <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Edit</button>
-        <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Delete</button>
+<div th:fragment="chore-card(chore)" class="card border border-gray-300 rounded-lg p-3 flex-1 min-w-[200px]">
+    <div class="card-name font-semibold text-base" th:text="${chore.name}">name</div>
+    <div class="mt-1" th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</div>
+    <div class="text-gray-500 text-sm" th:text="${chore.schedule}">schedule</div>
+    <div class="mt-2 flex gap-1.5">
+        <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML"
+                class="px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Complete</button>
+        <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML"
+                class="px-2 py-1 border rounded text-sm hover:bg-gray-100">Edit</button>
+        <button th:attr="data-chore-name=${chore.name}" onclick="confirmDelete(this)"
+                class="px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">Delete</button>
     </div>
 </div>
 </body>
