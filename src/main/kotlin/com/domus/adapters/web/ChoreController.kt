@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/chores")
 class ChoreController(
     private val listChoresUseCase: ListChoresUseCase,
     private val createChoreUseCase: CreateChoreUseCase,
@@ -32,12 +32,12 @@ class ChoreController(
     private val deleteChoreUseCase: DeleteChoreUseCase,
 ) {
 
-    @GetMapping("/chores")
+    @GetMapping
     fun getChores(): List<ChoreResponse> {
         return listChoresUseCase.getChores().map(ChoreResponse::fromDomain)
     }
 
-    @PostMapping("/chores")
+    @PostMapping
     fun addChore(@RequestBody request: ChoreRequest) {
         createChoreUseCase.addChore(
             name = request.name,
@@ -46,12 +46,12 @@ class ChoreController(
         )
     }
 
-    @PostMapping("/chores/{name}/complete")
+    @PostMapping("/{name}/complete")
     fun completeChore(@PathVariable name: String) {
         completeChoreUseCase.completeChore(name)
     }
 
-    @PutMapping("/chores/{name}")
+    @PutMapping("/{name}")
     fun updateChore(@PathVariable name: String, @RequestBody request: ChoreRequest): ChoreResponse {
         return ChoreResponse.fromDomain(
             updateChoreUseCase.updateChore(
@@ -63,7 +63,7 @@ class ChoreController(
         )
     }
 
-    @DeleteMapping("/chores/{name}")
+    @DeleteMapping("/{name}")
     fun deleteChore(@PathVariable name: String) {
         deleteChoreUseCase.deleteChore(name)
     }

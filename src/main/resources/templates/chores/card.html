@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="chore-card(chore)" class="card">
+    <div class="card-name" th:text="${chore.name}">name</div>
+    <div class="card-due" th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</div>
+    <div class="card-schedule" th:text="${chore.schedule}">schedule</div>
+    <div class="card-actions">
+        <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Complete</button>
+        <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Edit</button>
+        <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Delete</button>
+    </div>
+</div>
+</body>
+</html>
