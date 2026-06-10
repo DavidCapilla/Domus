@@ -10,8 +10,7 @@
                 class="px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Complete</button>
         <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML"
                 class="px-2 py-1 border rounded text-sm hover:bg-gray-100">Edit</button>
-        <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML"
-                hx-confirm="Are you sure you want to delete this chore?"
+        <button th:attr="data-chore-name=${chore.name}" onclick="confirmDelete(this)"
                 class="px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">Delete</button>
     </div>
 </div>
