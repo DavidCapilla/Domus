@@ -24,19 +24,48 @@
         }
         form { margin-bottom: 16px; }
         form input, form select, form button { padding: 8px; margin-right: 8px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
         .section { margin-bottom: 24px; }
         .section h2 { font-size: 1.1em; margin: 0 0 8px; }
         .empty { color: #888; font-style: italic; padding: 8px 0; }
-        .overdue td { color: #c00; }
         .error { color: #c00; padding: 8px; }
+
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            min-width: 200px;
+            flex: 1 1 220px;
+        }
+        .card-name {
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+        .card-due {
+            margin-top: 4px;
+        }
+        .card-schedule {
+            color: #888;
+            font-size: 0.85em;
+        }
+        .card-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 6px;
+        }
+        .overdue .card { border-color: #c00; }
+        .overdue .card-name { color: #c00; }
+
         .btn { padding: 4px 8px; cursor: pointer; }
 
         @media (max-width: 600px) {
-            table { display: block; overflow-x: auto; white-space: nowrap; }
             form input, form select { display: block; width: 100%; margin-bottom: 8px; box-sizing: border-box; }
             form button { width: 100%; }
+            .card { flex: 1 1 100%; min-width: 0; }
         }
     </style>
 </head>
@@ -58,64 +87,34 @@
 <div id="chore-list" th:fragment="chore-list">
     <div th:if="${error}" class="error" th:text="${error}">error</div>
 
-    <div class="section">
+    <div class="section overdue">
         <h2>Overdue</h2>
         <div th:if="${dashboard.overdue.isEmpty()}" class="empty">No overdue chores</div>
-        <table th:if="${!dashboard.overdue.isEmpty()}">
-            <thead><tr><th>Name</th><th>Due date</th><th>Schedule</th><th></th></tr></thead>
-            <tbody>
-            <tr th:each="chore : ${dashboard.overdue}" class="overdue">
-                <td th:text="${chore.name}">name</td>
-                <td th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</td>
-                <td th:text="${chore.schedule}">schedule</td>
-                <td>
-                    <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Complete</button>
-                    <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Edit</button>
-                    <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Delete</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="card-grid" th:if="${!dashboard.overdue.isEmpty()}">
+            <th:block th:each="chore : ${dashboard.overdue}">
+                <div th:replace="~{/chores/card :: chore-card(chore=${chore})}"></div>
+            </th:block>
+        </div>
     </div>
 
     <div class="section">
         <h2>Due Today</h2>
         <div th:if="${dashboard.dueToday.isEmpty()}" class="empty">No chores due today</div>
-        <table th:if="${!dashboard.dueToday.isEmpty()}">
-            <thead><tr><th>Name</th><th>Due date</th><th>Schedule</th><th></th></tr></thead>
-            <tbody>
-            <tr th:each="chore : ${dashboard.dueToday}">
-                <td th:text="${chore.name}">name</td>
-                <td th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</td>
-                <td th:text="${chore.schedule}">schedule</td>
-                <td>
-                    <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Complete</button>
-                    <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Edit</button>
-                    <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Delete</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="card-grid" th:if="${!dashboard.dueToday.isEmpty()}">
+            <th:block th:each="chore : ${dashboard.dueToday}">
+                <div th:replace="~{/chores/card :: chore-card(chore=${chore})}"></div>
+            </th:block>
+        </div>
     </div>
 
     <div class="section">
         <h2>Upcoming</h2>
         <div th:if="${dashboard.upcoming.isEmpty()}" class="empty">No upcoming chores</div>
-        <table th:if="${!dashboard.upcoming.isEmpty()}">
-            <thead><tr><th>Name</th><th>Due date</th><th>Schedule</th><th></th></tr></thead>
-            <tbody>
-            <tr th:each="chore : ${dashboard.upcoming}">
-                <td th:text="${chore.name}">name</td>
-                <td th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</td>
-                <td th:text="${chore.schedule}">schedule</td>
-                <td>
-                    <button th:attr="hx-post=|/chores/${chore.name}/complete|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Complete</button>
-                    <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Edit</button>
-                    <button th:attr="hx-delete=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML" class="btn">Delete</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="card-grid" th:if="${!dashboard.upcoming.isEmpty()}">
+            <th:block th:each="chore : ${dashboard.upcoming}">
+                <div th:replace="~{/chores/card :: chore-card(chore=${chore})}"></div>
+            </th:block>
+        </div>
     </div>
 </div>
 
