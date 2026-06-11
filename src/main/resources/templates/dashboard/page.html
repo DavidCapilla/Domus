@@ -32,6 +32,26 @@
             });
         }
 
+        function confirmComplete(btn) {
+            var choreName = btn.dataset.choreName;
+            Swal.fire({
+                title: 'Complete chore?',
+                text: 'Mark "' + choreName + '" as done?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, complete it'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    htmx.ajax('POST', '/chores/' + encodeURIComponent(choreName) + '/complete', {
+                        target: '#chore-list',
+                        swap: 'outerHTML'
+                    });
+                }
+            });
+        }
+
         function toggleDaysField(selectEl) {
             var form = selectEl.closest('form');
             var field = form.querySelector('[name="days"]');
