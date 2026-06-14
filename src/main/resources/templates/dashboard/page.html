@@ -62,6 +62,9 @@
         }
 
         function openModal() {
+            var form = document.querySelector('#add-chore-modal form');
+            form.reset();
+            toggleDaysField(form.querySelector('[name=scheduleType]'));
             document.getElementById('add-chore-modal').classList.remove('hidden');
         }
 
@@ -90,7 +93,7 @@
             <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
         </div>
         <form hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
-              hx-on::after-request="closeModal(); this.reset()">
+              hx-on::after-request="closeModal(); this.reset(); toggleDaysField(this.querySelector('[name=scheduleType]'))">
             <div class="space-y-3">
                 <input type="text" name="name" placeholder="New chore" required
                        class="p-2 border rounded w-full">
