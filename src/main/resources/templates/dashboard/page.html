@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Chores Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@2"></script>
@@ -94,7 +94,7 @@
     <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold">Add Chore</h2>
-            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&#215;</button>
         </div>
         <form hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
               hx-on::after-request="closeModal(); this.reset()">
@@ -181,9 +181,9 @@
     <div class="mb-6">
         <h2 class="text-lg font-semibold mb-2">Edit Chore</h2>
         <form class="flex flex-wrap gap-2" th:attr="hx-put=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML">
-            <input type="text" name="newName" th:value="${chore.name}" required
+            <input type="text" name="newName" th:value="${chore.name}" required="required"
                    class="p-2 border rounded flex-1 min-w-[150px]">
-            <input type="date" name="dueDate" th:value="${chore.dueDate}" required
+            <input type="date" name="dueDate" th:value="${chore.dueDate}" required="required"
                    class="p-2 border rounded">
             <select name="scheduleType" onchange="toggleDaysField(this)"
                     class="p-2 border rounded">
