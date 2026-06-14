@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="chore-detail(chore)">
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-600 mb-1">Name</label>
+        <div class="text-lg font-semibold" th:text="${chore.name}">name</div>
+    </div>
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-600 mb-1">Due date</label>
+        <div th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</div>
+    </div>
+    <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-600 mb-1">Schedule</label>
+        <div th:text="${chore.schedule}">schedule</div>
+    </div>
+    <div class="flex gap-2 pt-2 border-t">
+        <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#edit-modal-content" hx-swap="innerHTML"
+                hx-on::after-request="closeDetailModal(); document.getElementById('edit-chore-modal').classList.remove('hidden')"
+                class="flex-1 px-3 py-2 border rounded text-sm hover:bg-gray-100">Edit</button>
+        <button th:attr="data-chore-name=${chore.name}" onclick="closeDetailModal(); confirmDelete(this)"
+                class="flex-1 px-3 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700">Delete</button>
+    </div>
+</div>
+
+<div id="detail-chore-modal" th:fragment="detail-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div onclick="closeDetailModal()" class="absolute inset-0 bg-black/40"></div>
+    <div class="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
+        <h2 class="text-xl font-bold mb-4">Chore details</h2>
+        <div id="detail-modal-content"></div>
+        <button onclick="closeDetailModal()"
+                class="mt-4 w-full px-3 py-2 border rounded text-sm hover:bg-gray-100">Close</button>
+    </div>
+</div>
+</body>
+</html>

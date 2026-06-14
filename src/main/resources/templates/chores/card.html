@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div th:fragment="chore-card(chore)" class="card border border-gray-300 rounded-lg p-3 flex-1 min-w-[200px]">
-    <div class="card-name font-semibold text-base" th:text="${chore.name}">name</div>
-    <div class="mt-1" th:text="${#temporals.format(chore.dueDate, 'dd/MM/yyyy')}">due date</div>
-    <div class="text-gray-500 text-sm" th:text="${chore.schedule}">schedule</div>
-    <div class="mt-2 flex gap-1.5">
-        <button th:attr="data-chore-name=${chore.name}" onclick="confirmComplete(this)"
-                class="px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Complete</button>
-        <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#edit-modal-content" hx-swap="innerHTML"
-                hx-on::after-request="document.getElementById('edit-chore-modal')?.classList.remove('hidden')"
-                class="px-2 py-1 border rounded text-sm hover:bg-gray-100">Edit</button>
-        <button th:attr="data-chore-name=${chore.name}" onclick="confirmDelete(this)"
-                class="px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">Delete</button>
+<div th:fragment="chore-card(chore, status)" th:attr="data-chore-name=${chore.name},data-status=${status}"
+     onclick="openDetailModal(this)"
+     class="card border border-gray-200 rounded-lg p-3 flex-1 min-w-[200px] cursor-pointer hover:border-gray-400 hover:shadow-sm transition-shadow"
+     role="button" tabindex="0">
+    <div class="flex items-center justify-between">
+        <span class="font-semibold text-base truncate mr-2" th:text="${chore.name}">name</span>
+        <span th:if="${status == 'overdue'}"
+              class="shrink-0 text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full">Overdue</span>
+        <span th:if="${status == 'due-today'}"
+              class="shrink-0 text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">Today</span>
+        <span th:if="${status == 'upcoming'}"
+              class="shrink-0 text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">Upcoming</span>
     </div>
+    <button th:attr="data-chore-name=${chore.name}" onclick="event.stopPropagation(); confirmComplete(this)"
+            class="mt-2 px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Complete</button>
 </div>
 </body>
 </html>

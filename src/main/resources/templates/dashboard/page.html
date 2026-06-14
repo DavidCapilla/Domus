@@ -10,7 +10,6 @@
     <script src="/js/dashboard.js"></script>
     <style>
         .overdue-section .card { border-color: #c00 !important; }
-        .overdue-section .card-name { color: #c00 !important; }
     </style>
 </head>
 <body class="max-w-4xl mx-auto p-4">
@@ -22,6 +21,7 @@
 
 <div th:replace="~{dashboard/add-chore :: add-chore}"></div>
 <div th:replace="~{dashboard/edit-chore :: edit-chore}"></div>
+<div th:replace="~{dashboard/detail-chore :: detail-modal}"></div>
 <div th:replace="~{dashboard/list :: chore-list}"></div>
 </body>
 </html>

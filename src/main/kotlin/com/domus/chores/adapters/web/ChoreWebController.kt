@@ -85,6 +85,14 @@ class ChoreWebController(
         return "dashboard/edit-chore :: chore-edit"
     }
 
+    @GetMapping("/chores/{name}/detail")
+    fun choreDetail(@PathVariable name: String, model: Model): String {
+        val chore = listChoresUseCase.getChores().find { it.name == name }
+            ?: throw ChoreNotFoundException(name)
+        model.addAttribute("chore", chore)
+        return "dashboard/detail-chore :: chore-detail"
+    }
+
     @PutMapping("/chores/{name}")
     fun updateChore(
         @PathVariable name: String,

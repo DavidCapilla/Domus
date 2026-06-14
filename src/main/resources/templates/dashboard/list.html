@@ -24,7 +24,7 @@
         <div th:if="${dashboard.overdue.isEmpty()}" class="text-gray-500 italic py-2">No overdue chores</div>
         <div class="flex flex-wrap gap-3" th:if="${!dashboard.overdue.isEmpty()}">
             <th:block th:each="chore : ${dashboard.overdue}">
-                <div th:replace="~{/chores/card :: chore-card(chore=${chore})}"></div>
+                <div th:replace="~{/chores/card :: chore-card(chore=${chore}, status='overdue')}"></div>
             </th:block>
         </div>
     </div>
@@ -34,7 +34,7 @@
         <div th:if="${dashboard.dueToday.isEmpty()}" class="text-gray-500 italic py-2">No chores due today</div>
         <div class="flex flex-wrap gap-3" th:if="${!dashboard.dueToday.isEmpty()}">
             <th:block th:each="chore : ${dashboard.dueToday}">
-                <div th:replace="~{/chores/card :: chore-card(chore=${chore})}"></div>
+                <div th:replace="~{/chores/card :: chore-card(chore=${chore}, status='due-today')}"></div>
             </th:block>
         </div>
     </div>
@@ -44,7 +44,7 @@
         <div th:if="${dashboard.upcoming.isEmpty()}" class="text-gray-500 italic py-2">No upcoming chores</div>
         <div class="flex flex-wrap gap-3" th:if="${!dashboard.upcoming.isEmpty()}">
             <th:block th:each="chore : ${dashboard.upcoming}">
-                <div th:replace="~{/chores/card :: chore-card(chore=${chore})}"></div>
+                <div th:replace="~{/chores/card :: chore-card(chore=${chore}, status='upcoming')}"></div>
             </th:block>
         </div>
     </div>

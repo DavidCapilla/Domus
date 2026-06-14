@@ -109,6 +109,22 @@ class ChoreWebControllerTest {
                 .andExpect(content().string(containsString("hidden")))
         }
 
+        @Test
+        fun `detail modal is present in page`() {
+            mockMvc.perform(get("/"))
+                .andExpect(content().string(containsString("detail-chore-modal")))
+                .andExpect(content().string(containsString("Chore details")))
+                .andExpect(content().string(containsString("closeDetailModal")))
+        }
+
+        @Test
+        fun `cards have status data attribute`() {
+            repository.save(createChore(name = "Badge test chore", dueDate = LocalDate.of(2026, 6, 2)))
+
+            mockMvc.perform(get("/"))
+                .andExpect(content().string(containsString("data-status=\"overdue\"")))
+                .andExpect(content().string(containsString("Overdue")))
+        }
 
     }
 
@@ -248,6 +264,33 @@ class ChoreWebControllerTest {
                 .param("dueDate", "2026-06-25")
                 .param("scheduleType", "one_time"))
                 .andExpect(content().string(containsString("Name is required")))
+        }
+    }
+
+    @Nested
+    inner class ChoreDetail {
+
+        @Test
+        fun `returns detail with name due date and schedule`() {
+            mockMvc.perform(get("/chores/{name}/detail", "Placeholder chore"))
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("Placeholder chore")))
+                .andExpect(content().string(containsString("Due date")))
+                .andExpect(content().string(containsString("Schedule")))
+        }
+
+        @Test
+        fun `detail has edit and delete buttons`() {
+            mockMvc.perform(get("/chores/{name}/detail", "Placeholder chore"))
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("Edit")))
+                .andExpect(content().string(containsString("Delete")))
+        }
+
+        @Test
+        fun `returns 404 for non-existent chore`() {
+            mockMvc.perform(get("/chores/{name}/detail", "Non-existent"))
+                .andExpect(status().isNotFound)
         }
     }
 
