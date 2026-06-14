@@ -12,20 +12,26 @@
                class="p-2 border rounded w-full">
         <input type="date" name="dueDate" required
                class="p-2 border rounded w-full">
-        <div class="flex gap-4">
-            <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="scheduleType" value="one_time" checked onchange="toggleDaysField()"
+        <div>
+            <label class="flex items-center gap-2 cursor-pointer py-1">
+                <input type="radio" name="scheduleType" value="one_time" checked onclick="toggleDaysField(this)"
                        class="accent-blue-600">
                 <span>One time</span>
             </label>
-            <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="scheduleType" value="every_n_days" onchange="toggleDaysField()"
-                       class="accent-blue-600">
-                <span>Every N days</span>
+            <label class="flex flex-col cursor-pointer py-1">
+                <div class="flex items-center gap-2">
+                    <input type="radio" name="scheduleType" value="every_n_days" onclick="toggleDaysField(this)"
+                           class="accent-blue-600">
+                    <span>Recurrent</span>
+                </div>
+                <span class="recurring-days ml-6 mt-1" style="display:none">
+                    <span>every</span>
+                    <input type="number" name="days" value="7" min="1" disabled required
+                           class="w-16 p-1 border rounded text-center">
+                    <span>days</span>
+                </span>
             </label>
         </div>
-        <input type="number" name="days" value="7" style="display:none" placeholder="Every (days)" min="1" disabled required
-               class="p-2 border rounded w-full">
         <div class="flex justify-end gap-2 pt-2">
             <button type="button" onclick="closeModal()"
                     class="p-2 border rounded hover:bg-gray-100">Cancel</button>

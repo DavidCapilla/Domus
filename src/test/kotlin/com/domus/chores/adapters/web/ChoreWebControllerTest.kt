@@ -72,6 +72,15 @@ class ChoreWebControllerTest {
         }
 
         @Test
+        fun `recurring days group is in the add form`() {
+            mockMvc.perform(get("/"))
+                .andExpect(content().string(containsString("recurring-days")))
+                .andExpect(content().string(containsString("style=\"display:none\"")))
+                .andExpect(content().string(containsString("every")))
+                .andExpect(content().string(containsString("days")))
+        }
+
+        @Test
         fun `renders overdue section with chore names`() {
             repository.save(createChore(name = "Overdue chore", dueDate = LocalDate.of(2026, 6, 8)))
 

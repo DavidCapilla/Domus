@@ -41,10 +41,11 @@ function confirmComplete(btn) {
 function toggleDaysField(el) {
     var form = el ? el.closest('form') : document.querySelector('#add-chore-modal form');
     var field = form.querySelector('[name=days]');
+    var daysGroup = form.querySelector('.recurring-days');
     var checked = form.querySelector('[name=scheduleType]:checked');
     var scheduleType = checked ? checked.value : el.value;
     var visible = scheduleType === 'every_n_days';
-    field.style.display = visible ? '' : 'none';
+    if (daysGroup) daysGroup.style.display = visible ? '' : 'none';
     field.disabled = !visible;
     field.required = visible;
 }

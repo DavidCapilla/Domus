@@ -14,26 +14,32 @@
            class="p-2 border rounded w-full">
     <input type="date" name="dueDate" th:value="${chore.dueDate}" required="required"
            class="p-2 border rounded w-full">
-    <div class="flex gap-4">
-        <label class="inline-flex items-center gap-2 cursor-pointer">
+    <div>
+        <label class="flex items-center gap-2 cursor-pointer py-1">
             <input type="radio" name="scheduleType" value="one_time"
                    th:checked="${chore.schedule.toString().startsWith('OneTime')}"
-                   onchange="toggleDaysField(this)" class="accent-blue-600">
+                   onclick="toggleDaysField(this)" class="accent-blue-600">
             <span>One time</span>
         </label>
-        <label class="inline-flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="scheduleType" value="every_n_days"
-                   th:checked="${chore.schedule.toString().startsWith('EveryNDays')}"
-                   onchange="toggleDaysField(this)" class="accent-blue-600">
-            <span>Every N days</span>
-        </label>
+        <label class="flex flex-col cursor-pointer py-1">
+            <div class="flex items-center gap-2">
+                <input type="radio" name="scheduleType" value="every_n_days"
+                       th:checked="${chore.schedule.toString().startsWith('EveryNDays')}"
+                       onclick="toggleDaysField(this)" class="accent-blue-600">
+                <span>Recurrent</span>
+            </div>
+                <span class="recurring-days ml-6 mt-1"
+                      th:style="${chore.schedule.toString().startsWith('OneTime')} ? 'display:none' : ''">
+                    <span>every</span>
+                    <input type="number" name="days"
+                           th:value="${chore.schedule.toString().startsWith('EveryNDays') ? chore.schedule.days : 7}"
+                           th:disabled="${chore.schedule.toString().startsWith('OneTime')}" required
+                           min="1"
+                           class="w-16 p-1 border rounded text-center">
+                    <span>days</span>
+                </span>
+            </label>
     </div>
-    <input type="number" name="days"
-           th:value="${chore.schedule.toString().startsWith('EveryNDays') ? chore.schedule.days : 7}"
-           th:style="${chore.schedule.toString().startsWith('OneTime')} ? 'display:none' : 'display:block'"
-           placeholder="Every (days)" min="1"
-           th:disabled="${chore.schedule.toString().startsWith('OneTime')}"
-           class="p-2 border rounded w-full">
     <div class="flex justify-end gap-2 pt-2">
         <button type="button" onclick="closeEditModal()"
                 class="p-2 border rounded hover:bg-gray-100">Cancel</button>
