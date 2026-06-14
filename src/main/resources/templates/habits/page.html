@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Habits</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function toggleDaysField(selectEl) {
+            var form = selectEl.closest('form');
+            var field = form.querySelector('[name="days"]');
+            var visible = selectEl.value === 'every_n_days';
+            field.style.display = visible ? '' : 'none';
+            field.disabled = !visible;
+            field.required = visible;
+        }
+
+        function confirmLog(btn) {
+            var habitName = btn.dataset.habitName;
+            Swal.fire({
+                title: 'Log habit?',
+                text: 'Log "' + habitName + '" as done?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, log it'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    htmx.ajax('POST', '/habits/' + encodeURIComponent(habitName) + '/log', {
+                        target: '#habit-list',
+                        swap: 'outerHTML'
+                    });
+                }
+            });
+        }
+
+        function confirmDeleteHabit(btn) {
+            var habitName = btn.dataset.habitName;
+            Swal.fire({
+                title: 'Delete habit?',
+                text: 'Delete "' + habitName + '"? Completions will be kept.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    htmx.ajax('DELETE', '/habits/' + encodeURIComponent(habitName), {
+                        target: '#habit-list',
+                        swap: 'outerHTML'
+                    });
+                }
+            });
+        }
+    </script>
+</head>
+<body class="max-w-4xl mx-auto p-4">
+<h1 class="text-2xl font-bold mb-4">Habits</h1>
+
+<form class="mb-4 flex flex-wrap gap-2" hx-post="/habits" hx-target="#habit-list" hx-swap="outerHTML"
+      hx-on::after-request="this.reset()">
+    <input type="text" name="name" placeholder="Habit name" required="required"
+           class="p-2 border rounded flex-1 min-w-[120px]"/>
+    <input type="text" name="description" placeholder="Description (optional)"
+           class="p-2 border rounded flex-1 min-w-[120px]"/>
+    <input type="number" name="targetCount" placeholder="Target" min="1" required="required"
+           class="p-2 border rounded w-20"/>
+    <select name="timeWindowType" onchange="toggleDaysField(this)"
+            class="p-2 border rounded">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="every_n_days">Every N days</option>
+    </select>
+    <input type="number" name="days" style="display:none" placeholder="Days" min="1" disabled="disabled" required="required"
+           class="p-2 border rounded w-20"/>
+    <button class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Add</button>
+</form>
+
+<div id="habit-list" th:fragment="habit-list">
+    <div th:if="${error}" class="text-red-600 p-2" th:text="${error}">error</div>
+
+    <div th:if="${progressList.empty}" class="text-gray-500 italic py-2">No habits yet. Add one above.</div>
+    <div class="flex flex-wrap gap-3" th:if="${!progressList.empty}">
+        <th:block th:each="progress : ${progressList}">
+            <div th:replace="~{/habits/card :: habit-card(progress=${progress})}"></div>
+        </th:block>
+    </div>
+</div>
+
+<th:block th:remove="all">
+<div id="habit-list" th:fragment="habit-edit">
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Edit Habit</h2>
+        <form class="flex flex-wrap gap-2" th:attr="hx-put=|/habits/${progress.habit.name}|" hx-target="#habit-list" hx-swap="outerHTML">
+            <input type="text" name="newName" th:value="${progress.habit.name}" required="required"
+                   class="p-2 border rounded flex-1 min-w-[120px]"/>
+            <input type="text" name="description" th:value="${progress.habit.description}"
+                   class="p-2 border rounded flex-1 min-w-[120px]"/>
+            <input type="number" name="targetCount" th:value="${progress.habit.targetCount}" min="1" required="required"
+                   class="p-2 border rounded w-20"/>
+            <select name="timeWindowType" onchange="toggleDaysField(this)"
+                    class="p-2 border rounded">
+                <option value="daily" th:selected="${progress.habit.timeWindow.toString() == 'Daily'}">Daily</option>
+                <option value="weekly" th:selected="${progress.habit.timeWindow.toString() == 'Weekly'}">Weekly</option>
+                <option value="monthly" th:selected="${progress.habit.timeWindow.toString() == 'Monthly'}">Monthly</option>
+                <option value="every_n_days" th:selected="${progress.habit.timeWindow.toString().startsWith('EveryNDays')}">Every N days</option>
+            </select>
+            <input type="number" name="days"
+                   th:style="${progress.habit.timeWindow.toString().startsWith('EveryNDays')} ? 'display:block' : 'display:none'"
+                   placeholder="Days" min="1"
+                   th:disabled="${!progress.habit.timeWindow.toString().startsWith('EveryNDays')}"
+                   class="p-2 border rounded w-20"/>
+            <button class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+            <button type="button" hx-get="/habits/list" hx-target="#habit-list" hx-swap="outerHTML"
+                    class="p-2 border rounded hover:bg-gray-100">Cancel</button>
+        </form>
+    </div>
+</div>
+</th:block>
+</body>
+</html>

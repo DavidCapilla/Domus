@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Chores Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@2"></script>
@@ -67,16 +67,16 @@
 
 <form class="mb-4 flex flex-wrap gap-2" hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
       hx-on::after-request="this.reset()">
-    <input type="text" name="name" placeholder="New chore" required
+    <input type="text" name="name" placeholder="New chore" required="required"
            class="p-2 border rounded flex-1 min-w-[150px]">
-    <input type="date" name="dueDate" required
+    <input type="date" name="dueDate" required="required"
            class="p-2 border rounded">
     <select name="scheduleType" onchange="toggleDaysField(this)"
             class="p-2 border rounded">
         <option value="one_time">One time</option>
         <option value="every_n_days">Every N days</option>
     </select>
-    <input type="number" name="days" style="display:none" placeholder="Every (days)" min="1" disabled required
+    <input type="number" name="days" style="display:none" placeholder="Every (days)" min="1" disabled="disabled" required="required"
            class="p-2 border rounded">
     <button class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Add</button>
 </form>
@@ -135,9 +135,9 @@
     <div class="mb-6">
         <h2 class="text-lg font-semibold mb-2">Edit Chore</h2>
         <form class="flex flex-wrap gap-2" th:attr="hx-put=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML">
-            <input type="text" name="newName" th:value="${chore.name}" required
-                   class="p-2 border rounded flex-1 min-w-[150px]">
-            <input type="date" name="dueDate" th:value="${chore.dueDate}" required
+            <input type="text" name="newName" th:value="${chore.name}" required="required"
+                   class="p-2 border rounded flex-1 min-w-[120px]">
+            <input type="date" name="dueDate" th:value="${chore.dueDate}" required="required"
                    class="p-2 border rounded">
             <select name="scheduleType" onchange="toggleDaysField(this)"
                     class="p-2 border rounded">
