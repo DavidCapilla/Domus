@@ -60,14 +60,14 @@ class ChoreWebControllerTest {
         fun `modal form posts to correct endpoint`() {
             mockMvc.perform(get("/"))
                 .andExpect(content().string(containsString("hx-post=\"/chores\"")))
-                .andExpect(content().string(containsString("hx-target=\"#chore-list\"")))
-                .andExpect(content().string(containsString("hx-swap=\"outerHTML\"")))
+                .andExpect(content().string(containsString("hx-target=\"#chore-list\"")))  // 2026-06-14: brittle
+                .andExpect(content().string(containsString("hx-swap=\"outerHTML\"")))       // 2026-06-14: brittle
         }
 
         @Test
         fun `days field defaults to 7 and is hidden by default`() {
             mockMvc.perform(get("/"))
-                .andExpect(content().string(containsString("value=\"7\"")))
+                .andExpect(content().string(containsString("value=\"7\"")))  // 2026-06-14: brittle
                 .andExpect(content().string(containsString("display:none")))
         }
 
