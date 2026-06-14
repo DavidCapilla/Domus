@@ -52,10 +52,12 @@
             });
         }
 
-        function toggleDaysField(selectEl) {
-            var form = selectEl.closest('form');
-            var field = form.querySelector('[name="days"]');
-            var visible = selectEl.value === 'every_n_days';
+        function toggleDaysField(el) {
+            var form = el ? el.closest('form') : document.querySelector('#add-chore-modal form');
+            var field = form.querySelector('[name=days]');
+            var checked = form.querySelector('[name=scheduleType]:checked');
+            var scheduleType = checked ? checked.value : el.value;
+            var visible = scheduleType === 'every_n_days';
             field.style.display = visible ? '' : 'none';
             field.disabled = !visible;
             field.required = visible;
@@ -65,7 +67,8 @@
             var form = document.querySelector('#add-chore-modal form');
             form.reset();
             form.querySelector('[name=dueDate]').value = new Date().toISOString().split('T')[0];
-            toggleDaysField(form.querySelector('[name=scheduleType]'));
+            form.querySelector('[name=scheduleType][value=one_time]').checked = true;
+            toggleDaysField();
             document.getElementById('add-chore-modal').classList.remove('hidden');
         }
 
@@ -94,17 +97,24 @@
             <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
         </div>
         <form hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
-              hx-on::after-request="closeModal(); this.reset(); toggleDaysField(this.querySelector('[name=scheduleType]'))">
+              hx-on::after-request="closeModal(); this.reset()">
             <div class="space-y-3">
                 <input type="text" name="name" placeholder="New chore" required
                        class="p-2 border rounded w-full">
                 <input type="date" name="dueDate" required
                        class="p-2 border rounded w-full">
-                <select name="scheduleType" onchange="toggleDaysField(this)"
-                        class="p-2 border rounded w-full">
-                    <option value="one_time">One time</option>
-                    <option value="every_n_days">Every N days</option>
-                </select>
+                <div class="flex gap-4">
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="scheduleType" value="one_time" checked onchange="toggleDaysField()"
+                               class="accent-blue-600">
+                        <span>One time</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="scheduleType" value="every_n_days" onchange="toggleDaysField()"
+                               class="accent-blue-600">
+                        <span>Every N days</span>
+                    </label>
+                </div>
                 <input type="number" name="days" value="7" style="display:none" placeholder="Every (days)" min="1" disabled required
                        class="p-2 border rounded w-full">
                 <div class="flex justify-end gap-2 pt-2">
