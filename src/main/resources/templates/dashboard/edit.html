@@ -1,27 +1,46 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div id="chore-list" th:fragment="chore-edit">
-    <div class="mb-6">
-        <h2 class="text-lg font-semibold mb-2">Edit Chore</h2>
-        <form class="flex flex-wrap gap-2" th:attr="hx-put=|/chores/${chore.name}|" hx-target="#chore-list" hx-swap="outerHTML">
+<div id="edit-chore-modal" th:fragment="chore-edit"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden"
+     role="dialog" aria-modal="true">
+    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Edit Chore</h2>
+            <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&#215;</button>
+        </div>
+        <form class="space-y-3" th:attr="hx-put=|/chores/${chore.name}|"
+              hx-target="#chore-list" hx-swap="outerHTML"
+              hx-on::after-request="closeEditModal()">
             <input type="text" name="newName" th:value="${chore.name}" required="required"
-                   class="p-2 border rounded flex-1 min-w-[150px]">
+                   class="p-2 border rounded w-full">
             <input type="date" name="dueDate" th:value="${chore.dueDate}" required="required"
-                   class="p-2 border rounded">
-            <select name="scheduleType" onchange="toggleDaysField(this)"
-                    class="p-2 border rounded">
-                <option value="one_time" th:selected="${chore.schedule.toString().startsWith('OneTime')}">One time</option>
-                <option value="every_n_days" th:selected="${chore.schedule.toString().startsWith('EveryNDays')}">Every N days</option>
-            </select>
+                   class="p-2 border rounded w-full">
+            <div class="flex gap-4">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="scheduleType" value="one_time"
+                           th:checked="${chore.schedule.toString().startsWith('OneTime')}"
+                           onchange="toggleDaysField(this)" class="accent-blue-600">
+                    <span>One time</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="scheduleType" value="every_n_days"
+                           th:checked="${chore.schedule.toString().startsWith('EveryNDays')}"
+                           onchange="toggleDaysField(this)" class="accent-blue-600">
+                    <span>Every N days</span>
+                </label>
+            </div>
             <input type="number" name="days"
+                   th:value="${chore.schedule.toString().startsWith('EveryNDays') ? chore.schedule.days : 7}"
                    th:style="${chore.schedule.toString().startsWith('OneTime')} ? 'display:none' : 'display:block'"
                    placeholder="Every (days)" min="1"
                    th:disabled="${chore.schedule.toString().startsWith('OneTime')}"
-                   class="p-2 border rounded">
-            <button class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
-            <button type="button" hx-get="/chores" hx-target="#chore-list" hx-swap="outerHTML"
-                    class="p-2 border rounded hover:bg-gray-100">Cancel</button>
+                   class="p-2 border rounded w-full">
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeEditModal()"
+                        class="p-2 border rounded hover:bg-gray-100">Cancel</button>
+                <button class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+            </div>
         </form>
     </div>
 </div>
