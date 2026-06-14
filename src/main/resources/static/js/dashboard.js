@@ -66,6 +66,19 @@ function closeEditModal() {
     document.getElementById('edit-chore-modal').classList.add('hidden');
 }
 
+function openDetailModal(el) {
+    var name = el.dataset.choreName;
+    htmx.ajax('GET', '/chores/' + encodeURIComponent(name) + '/detail', {
+        target: '#detail-modal-content',
+        swap: 'innerHTML'
+    });
+    document.getElementById('detail-chore-modal').classList.remove('hidden');
+}
+
+function closeDetailModal() {
+    document.getElementById('detail-chore-modal').classList.add('hidden');
+}
+
 document.addEventListener('click', function (e) {
     var addModal = document.getElementById('add-chore-modal');
     if (e.target === addModal) closeModal();

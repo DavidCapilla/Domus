@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -32,6 +33,8 @@ class ChoreWebController(
     private val completeChoreUseCase: CompleteChoreUseCase,
     private val deleteChoreUseCase: DeleteChoreUseCase,
 ) {
+    @ModelAttribute("today")
+    fun today(): LocalDate = LocalDate.now()
 
     @GetMapping("/")
     fun index(model: Model): String {
@@ -83,6 +86,14 @@ class ChoreWebController(
             ?: throw ChoreNotFoundException(name)
         model.addAttribute("chore", chore)
         return "dashboard/edit-chore :: chore-edit"
+    }
+
+    @GetMapping("/chores/{name}/detail")
+    fun choreDetail(@PathVariable name: String, model: Model): String {
+        val chore = listChoresUseCase.getChores().find { it.name == name }
+            ?: throw ChoreNotFoundException(name)
+        model.addAttribute("chore", chore)
+        return "dashboard/detail-chore :: chore-detail"
     }
 
     @PutMapping("/chores/{name}")
