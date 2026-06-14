@@ -7,7 +7,11 @@
      role="button" tabindex="0">
     <div class="flex items-center gap-2 sm:flex-col sm:items-stretch sm:gap-1">
         <div class="flex items-center gap-2 min-w-0 sm:justify-between">
-            <span class="font-semibold text-base truncate min-w-0" th:text="${chore.name}">name</span>
+            <div class="flex items-center gap-1 min-w-0">
+                <span th:if="${chore.schedule.toString().startsWith('EveryNDays')}" class="shrink-0 text-sm">🔁</span>
+                <span th:if="${chore.schedule.toString().startsWith('OneTime')}" class="shrink-0 text-sm">1️⃣</span>
+                <span class="font-semibold text-base truncate min-w-0" th:text="${chore.name}">name</span>
+            </div>
             <span th:if="${status == 'overdue'}"
                   class="shrink-0 text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full"
                   th:text="|overdue ${today.toEpochDay() - chore.dueDate.toEpochDay()} day${today.toEpochDay() - chore.dueDate.toEpochDay() == 1 ? '' : 's'}|">overdue N days</span>
