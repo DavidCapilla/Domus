@@ -60,26 +60,58 @@
             field.disabled = !visible;
             field.required = visible;
         }
+
+        function openModal() {
+            document.getElementById('add-chore-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('add-chore-modal').classList.add('hidden');
+        }
+
+        document.addEventListener('click', function (e) {
+            var modal = document.getElementById('add-chore-modal');
+            if (e.target === modal) closeModal();
+        });
     </script>
 </head>
 <body class="max-w-4xl mx-auto p-4">
-<h1 class="text-2xl font-bold mb-4">Chores Dashboard</h1>
+<div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Chores Dashboard</h1>
+    <button onclick="openModal()"
+            class="w-10 h-10 bg-blue-600 text-white text-2xl rounded-full hover:bg-blue-700 flex items-center justify-center leading-none pb-0.5">+</button>
+</div>
 
-<form class="mb-4 flex flex-wrap gap-2" hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
-      hx-on::after-request="this.reset()">
-    <input type="text" name="name" placeholder="New chore" required
-           class="p-2 border rounded flex-1 min-w-[150px]">
-    <input type="date" name="dueDate" required
-           class="p-2 border rounded">
-    <select name="scheduleType" onchange="toggleDaysField(this)"
-            class="p-2 border rounded">
-        <option value="one_time">One time</option>
-        <option value="every_n_days">Every N days</option>
-    </select>
-    <input type="number" name="days" style="display:none" placeholder="Every (days)" min="1" disabled required
-           class="p-2 border rounded">
-    <button class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Add</button>
-</form>
+<div id="add-chore-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden"
+     role="dialog" aria-modal="true">
+    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Add Chore</h2>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+        </div>
+        <form hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
+              hx-on::after-request="closeModal(); this.reset()">
+            <div class="space-y-3">
+                <input type="text" name="name" placeholder="New chore" required
+                       class="p-2 border rounded w-full">
+                <input type="date" name="dueDate" required
+                       class="p-2 border rounded w-full">
+                <select name="scheduleType" onchange="toggleDaysField(this)"
+                        class="p-2 border rounded w-full">
+                    <option value="one_time">One time</option>
+                    <option value="every_n_days">Every N days</option>
+                </select>
+                <input type="number" name="days" style="display:none" placeholder="Every (days)" min="1" disabled required
+                       class="p-2 border rounded w-full">
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal()"
+                            class="p-2 border rounded hover:bg-gray-100">Cancel</button>
+                    <button class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div id="chore-list" th:fragment="chore-list">
     <div th:if="${error}" class="text-red-600 p-2" th:text="${error}">error</div>
