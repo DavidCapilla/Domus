@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="add-chore"
+          th:replace="~{dashboard/modal :: modal(id='add-chore-modal', title='Add Chore', closeFn='closeModal', content=~{dashboard/add-chore :: form})}">
+</th:block>
+
+<form th:fragment="form" hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
+      hx-on::after-request="closeModal(); this.reset()">
+    <div class="space-y-3">
+        <input type="text" name="name" placeholder="New chore" required
+               class="p-2 border rounded w-full">
+        <input type="date" name="dueDate" required
+               class="p-2 border rounded w-full">
+        <div class="flex gap-4">
+            <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="scheduleType" value="one_time" checked onchange="toggleDaysField()"
+                       class="accent-blue-600">
+                <span>One time</span>
+            </label>
+            <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="scheduleType" value="every_n_days" onchange="toggleDaysField()"
+                       class="accent-blue-600">
+                <span>Every N days</span>
+            </label>
+        </div>
+        <input type="number" name="days" value="7" style="display:none" placeholder="Every (days)" min="1" disabled required
+               class="p-2 border rounded w-full">
+        <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal()"
+                    class="p-2 border rounded hover:bg-gray-100">Cancel</button>
+            <button class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Add</button>
+        </div>
+    </div>
+</form>
+</body>
+</html>

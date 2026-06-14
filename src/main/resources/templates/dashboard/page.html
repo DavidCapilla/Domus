@@ -20,7 +20,8 @@
             class="w-10 h-10 bg-blue-600 text-white text-2xl rounded-full hover:bg-blue-700 flex items-center justify-center leading-none pb-0.5">+</button>
 </div>
 
-<div th:replace="~{dashboard/modal :: add-chore-modal}"></div>
+<div th:replace="~{dashboard/add-chore :: add-chore}"></div>
+<div th:replace="~{dashboard/edit-chore :: edit-chore}"></div>
 <div th:replace="~{dashboard/list :: chore-list}"></div>
 </body>
 </html>

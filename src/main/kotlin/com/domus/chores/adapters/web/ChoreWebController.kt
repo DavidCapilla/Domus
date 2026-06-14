@@ -82,7 +82,7 @@ class ChoreWebController(
         val chore = listChoresUseCase.getChores().find { it.name == name }
             ?: throw ChoreNotFoundException(name)
         model.addAttribute("chore", chore)
-        return "dashboard/edit :: chore-edit"
+        return "dashboard/edit-chore :: chore-edit"
     }
 
     @PutMapping("/chores/{name}")

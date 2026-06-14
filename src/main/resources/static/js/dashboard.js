@@ -62,7 +62,11 @@ function closeModal() {
     document.getElementById('add-chore-modal').classList.add('hidden');
 }
 
+function closeEditModal() {
+    document.getElementById('edit-chore-modal').classList.add('hidden');
+}
+
 document.addEventListener('click', function (e) {
-    var modal = document.getElementById('add-chore-modal');
-    if (e.target === modal) closeModal();
+    var addModal = document.getElementById('add-chore-modal');
+    if (e.target === addModal) closeModal();
 });

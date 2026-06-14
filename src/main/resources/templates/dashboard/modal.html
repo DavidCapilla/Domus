@@ -1,42 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div id="add-chore-modal" th:fragment="add-chore-modal"
-     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden"
-     role="dialog" aria-modal="true">
-    <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold">Add Chore</h2>
-            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&#215;</button>
-        </div>
-        <form hx-post="/chores" hx-target="#chore-list" hx-swap="outerHTML"
-              hx-on::after-request="closeModal(); this.reset()">
-            <div class="space-y-3">
-                <input type="text" name="name" placeholder="New chore" required
-                       class="p-2 border rounded w-full">
-                <input type="date" name="dueDate" required
-                       class="p-2 border rounded w-full">
-                <div class="flex gap-4">
-                    <label class="inline-flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="scheduleType" value="one_time" checked onchange="toggleDaysField()"
-                               class="accent-blue-600">
-                        <span>One time</span>
-                    </label>
-                    <label class="inline-flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="scheduleType" value="every_n_days" onchange="toggleDaysField()"
-                               class="accent-blue-600">
-                        <span>Every N days</span>
-                    </label>
-                </div>
-                <input type="number" name="days" value="7" style="display:none" placeholder="Every (days)" min="1" disabled required
-                       class="p-2 border rounded w-full">
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal()"
-                            class="p-2 border rounded hover:bg-gray-100">Cancel</button>
-                    <button class="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Add</button>
-                </div>
+<div th:fragment="modal(id, title, closeFn)">
+    <div th:id="${id}" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden"
+         role="dialog" aria-modal="true">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold" th:text="${title}">title</h2>
+                <button th:attr="onclick=|${closeFn}()|" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&#215;</button>
             </div>
-        </form>
+            <th:block th:replace="${content}" />
+        </div>
     </div>
 </div>
 </body>
