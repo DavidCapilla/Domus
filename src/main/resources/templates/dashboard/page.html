@@ -64,6 +64,7 @@
         function openModal() {
             var form = document.querySelector('#add-chore-modal form');
             form.reset();
+            form.querySelector('[name=dueDate]').value = new Date().toISOString().split('T')[0];
             toggleDaysField(form.querySelector('[name=scheduleType]'));
             document.getElementById('add-chore-modal').classList.remove('hidden');
         }
@@ -104,7 +105,7 @@
                     <option value="one_time">One time</option>
                     <option value="every_n_days">Every N days</option>
                 </select>
-                <input type="number" name="days" style="display:none" placeholder="Every (days)" min="1" disabled required
+                <input type="number" name="days" value="7" style="display:none" placeholder="Every (days)" min="1" disabled required
                        class="p-2 border rounded w-full">
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeModal()"
