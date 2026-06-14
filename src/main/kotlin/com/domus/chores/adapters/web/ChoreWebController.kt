@@ -42,7 +42,7 @@ class ChoreWebController(
     @GetMapping("/chores")
     fun getChores(model: Model): String {
         model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
-        return "dashboard/page :: chore-list"
+        return "dashboard/list :: chore-list"
     }
 
     @PostMapping("/chores")
@@ -56,7 +56,7 @@ class ChoreWebController(
         if (name.isBlank()) {
             model.addAttribute("error", "Name is required")
             model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
-            return "dashboard/page :: chore-list"
+            return "dashboard/list :: chore-list"
         }
         val schedule = when (scheduleType) {
             "one_time" -> Schedule.OneTime
@@ -65,7 +65,7 @@ class ChoreWebController(
                 if (daysInt == null || daysInt <= 0) {
                     model.addAttribute("error", "Days must be a positive number")
                     model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
-                    return "dashboard/page :: chore-list"
+                    return "dashboard/list :: chore-list"
                 }
                 Schedule.EveryNDays(daysInt)
             }
@@ -74,7 +74,7 @@ class ChoreWebController(
         }
         createChoreUseCase.addChore(name = name, dueDate = dueDate, schedule = schedule)
         model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
-        return "dashboard/page :: chore-list"
+        return "dashboard/list :: chore-list"
     }
 
     @GetMapping("/chores/{name}/edit")
@@ -82,7 +82,7 @@ class ChoreWebController(
         val chore = listChoresUseCase.getChores().find { it.name == name }
             ?: throw ChoreNotFoundException(name)
         model.addAttribute("chore", chore)
-        return "dashboard/page :: chore-edit"
+        return "dashboard/edit :: chore-edit"
     }
 
     @PutMapping("/chores/{name}")
@@ -97,7 +97,7 @@ class ChoreWebController(
         if (newName.isBlank()) {
             model.addAttribute("error", "Name is required")
             model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
-            return "dashboard/page :: chore-list"
+            return "dashboard/list :: chore-list"
         }
         val schedule = when (scheduleType) {
             "one_time" -> Schedule.OneTime
@@ -106,7 +106,7 @@ class ChoreWebController(
                 if (daysInt == null || daysInt <= 0) {
                     model.addAttribute("error", "Days must be a positive number")
                     model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
-                    return "dashboard/page :: chore-list"
+                    return "dashboard/list :: chore-list"
                 }
                 Schedule.EveryNDays(daysInt)
             }
@@ -120,21 +120,21 @@ class ChoreWebController(
             schedule = schedule
         )
         model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
-        return "dashboard/page :: chore-list"
+        return "dashboard/list :: chore-list"
     }
 
     @PostMapping("/chores/{name}/complete")
     fun completeChore(@PathVariable name: String, model: Model): String {
         completeChoreUseCase.completeChore(name)
         model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
-        return "dashboard/page :: chore-list"
+        return "dashboard/list :: chore-list"
     }
 
     @DeleteMapping("/chores/{name}")
     fun deleteChore(@PathVariable name: String, model: Model): String {
         deleteChoreUseCase.deleteChore(name)
         model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
-        return "dashboard/page :: chore-list"
+        return "dashboard/list :: chore-list"
     }
 
     @ExceptionHandler(ChoreAlreadyExistsException::class)

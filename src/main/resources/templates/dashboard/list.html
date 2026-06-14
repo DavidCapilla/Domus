@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="chore-list" th:fragment="chore-list">
+    <div th:if="${error}" class="text-red-600 p-2" th:text="${error}">error</div>
+
+    <div class="flex gap-3 mb-5 flex-wrap">
+        <div class="flex-1 min-w-full sm:min-w-[120px] border border-red-600 rounded-lg p-3 text-center">
+            <div class="text-2xl font-bold text-red-600" th:text="${dashboard.overdue.size()}">0</div>
+            <div class="text-sm text-gray-500 mt-0.5">Overdue</div>
+        </div>
+        <div class="flex-1 min-w-full sm:min-w-[120px] border border-gray-300 rounded-lg p-3 text-center">
+            <div class="text-2xl font-bold" th:text="${dashboard.dueToday.size()}">0</div>
+            <div class="text-sm text-gray-500 mt-0.5">Today</div>
+        </div>
+        <div class="flex-1 min-w-full sm:min-w-[120px] border border-gray-300 rounded-lg p-3 text-center">
+            <div class="text-2xl font-bold" th:text="${dashboard.upcoming.size()}">0</div>
+            <div class="text-sm text-gray-500 mt-0.5">Upcoming</div>
+        </div>
+    </div>
+
+    <div class="mb-6 overdue-section">
+        <h2 class="text-lg font-semibold mb-2">Overdue</h2>
+        <div th:if="${dashboard.overdue.isEmpty()}" class="text-gray-500 italic py-2">No overdue chores</div>
+        <div class="flex flex-wrap gap-3" th:if="${!dashboard.overdue.isEmpty()}">
+            <th:block th:each="chore : ${dashboard.overdue}">
+                <div th:replace="~{/chores/card :: chore-card(chore=${chore})}"></div>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Due Today</h2>
+        <div th:if="${dashboard.dueToday.isEmpty()}" class="text-gray-500 italic py-2">No chores due today</div>
+        <div class="flex flex-wrap gap-3" th:if="${!dashboard.dueToday.isEmpty()}">
+            <th:block th:each="chore : ${dashboard.dueToday}">
+                <div th:replace="~{/chores/card :: chore-card(chore=${chore})}"></div>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <h2 class="text-lg font-semibold mb-2">Upcoming</h2>
+        <div th:if="${dashboard.upcoming.isEmpty()}" class="text-gray-500 italic py-2">No upcoming chores</div>
+        <div class="flex flex-wrap gap-3" th:if="${!dashboard.upcoming.isEmpty()}">
+            <th:block th:each="chore : ${dashboard.upcoming}">
+                <div th:replace="~{/chores/card :: chore-card(chore=${chore})}"></div>
+            </th:block>
+        </div>
+    </div>
+</div>
+</body>
+</html>
