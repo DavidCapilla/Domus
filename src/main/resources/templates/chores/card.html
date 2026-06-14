@@ -8,7 +8,7 @@
     <div class="mt-2 flex gap-1.5">
         <button th:attr="data-chore-name=${chore.name}" onclick="confirmComplete(this)"
                 class="px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Complete</button>
-        <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#modal-container" hx-swap="innerHTML"
+        <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#edit-modal-content" hx-swap="innerHTML"
                 hx-on::after-request="document.getElementById('edit-chore-modal')?.classList.remove('hidden')"
                 class="px-2 py-1 border rounded text-sm hover:bg-gray-100">Edit</button>
         <button th:attr="data-chore-name=${chore.name}" onclick="confirmDelete(this)"

@@ -63,8 +63,7 @@ function closeModal() {
 }
 
 function closeEditModal() {
-    var modal = document.getElementById('edit-chore-modal');
-    if (modal) modal.remove();
+    document.getElementById('edit-chore-modal').classList.add('hidden');
 }
 
 document.addEventListener('click', function (e) {

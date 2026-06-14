@@ -209,8 +209,8 @@ class ChoreWebControllerTest {
         fun `returns edit form with pre-filled name`() {
             mockMvc.perform(get("/chores/{name}/edit", "Placeholder chore"))
                 .andExpect(status().isOk)
-                .andExpect(content().string(containsString("Edit Chore")))
-                .andExpect(content().string(containsString("Placeholder chore")))
+                .andExpect(content().string(containsString("value=\"Placeholder chore\"")))
+                .andExpect(content().string(containsString("hx-put=\"/chores/Placeholder chore\"")))
         }
 
         @Test
