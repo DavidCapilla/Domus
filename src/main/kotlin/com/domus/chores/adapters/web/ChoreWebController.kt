@@ -1,5 +1,7 @@
 package com.domus.chores.adapters.web
 
+import com.domus.chores.adapters.web.dto.ChoreResponse
+import com.domus.chores.adapters.web.dto.DashboardResponse
 import com.domus.chores.application.CompleteChoreUseCase
 import com.domus.chores.application.CreateChoreUseCase
 import com.domus.chores.application.DeleteChoreUseCase
@@ -38,13 +40,13 @@ class ChoreWebController(
 
     @GetMapping("/")
     fun index(model: Model): String {
-        model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+        model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
         return "dashboard/page"
     }
 
     @GetMapping("/chores")
     fun getChores(model: Model): String {
-        model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+        model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
         return "dashboard/list :: chore-list"
     }
 
@@ -58,7 +60,7 @@ class ChoreWebController(
     ): String {
         if (name.isBlank()) {
             model.addAttribute("error", "Name is required")
-            model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+            model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
             return "dashboard/list :: chore-list"
         }
         val schedule = when (scheduleType) {
@@ -67,7 +69,7 @@ class ChoreWebController(
                 val daysInt = days?.toIntOrNull()
                 if (daysInt == null || daysInt <= 0) {
                     model.addAttribute("error", "Days must be a positive number")
-                    model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+                    model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
                     return "dashboard/list :: chore-list"
                 }
                 Schedule.EveryNDays(daysInt)
@@ -76,7 +78,7 @@ class ChoreWebController(
             else -> throw IllegalArgumentException("Unknown schedule type: $scheduleType")
         }
         createChoreUseCase.addChore(name = name, dueDate = dueDate, schedule = schedule)
-        model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+        model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
         return "dashboard/list :: chore-list"
     }
 
@@ -84,7 +86,7 @@ class ChoreWebController(
     fun editChoreForm(@PathVariable name: String, model: Model): String {
         val chore = listChoresUseCase.getChores().find { it.name == name }
             ?: throw ChoreNotFoundException(name)
-        model.addAttribute("chore", chore)
+        model.addAttribute("chore", ChoreResponse.fromDomain(chore))
         return "dashboard/edit-chore :: chore-edit"
     }
 
@@ -92,7 +94,7 @@ class ChoreWebController(
     fun choreDetail(@PathVariable name: String, model: Model): String {
         val chore = listChoresUseCase.getChores().find { it.name == name }
             ?: throw ChoreNotFoundException(name)
-        model.addAttribute("chore", chore)
+        model.addAttribute("chore", ChoreResponse.fromDomain(chore))
         return "dashboard/detail-chore :: chore-detail"
     }
 
@@ -107,7 +109,7 @@ class ChoreWebController(
     ): String {
         if (newName.isBlank()) {
             model.addAttribute("error", "Name is required")
-            model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+            model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
             return "dashboard/list :: chore-list"
         }
         val schedule = when (scheduleType) {
@@ -116,7 +118,7 @@ class ChoreWebController(
                 val daysInt = days?.toIntOrNull()
                 if (daysInt == null || daysInt <= 0) {
                     model.addAttribute("error", "Days must be a positive number")
-                    model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+                    model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
                     return "dashboard/list :: chore-list"
                 }
                 Schedule.EveryNDays(daysInt)
@@ -130,21 +132,21 @@ class ChoreWebController(
             dueDate = dueDate,
             schedule = schedule
         )
-        model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+        model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
         return "dashboard/list :: chore-list"
     }
 
     @PostMapping("/chores/{name}/complete")
     fun completeChore(@PathVariable name: String, model: Model): String {
         completeChoreUseCase.completeChore(name)
-        model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+        model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
         return "dashboard/list :: chore-list"
     }
 
     @DeleteMapping("/chores/{name}")
     fun deleteChore(@PathVariable name: String, model: Model): String {
         deleteChoreUseCase.deleteChore(name)
-        model.addAttribute("dashboard", getDashboardUseCase.getDashboard())
+        model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
         return "dashboard/list :: chore-list"
     }
 

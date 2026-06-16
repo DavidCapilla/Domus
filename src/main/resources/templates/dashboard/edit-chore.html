@@ -17,23 +17,23 @@
     <div>
         <label class="flex items-center gap-2 cursor-pointer py-1">
             <input type="radio" name="scheduleType" value="one_time"
-                   th:checked="${chore.schedule.toString().startsWith('OneTime')}"
+                   th:checked="${chore.schedule.isOneTime}"
                    onclick="toggleDaysField(this)" class="accent-blue-600">
             <span>One time</span>
         </label>
         <label class="flex flex-col cursor-pointer py-1">
             <div class="flex items-center gap-2">
                 <input type="radio" name="scheduleType" value="every_n_days"
-                       th:checked="${chore.schedule.toString().startsWith('EveryNDays')}"
+                       th:checked="${!chore.schedule.isOneTime}"
                        onclick="toggleDaysField(this)" class="accent-blue-600">
                 <span>Recurrent</span>
             </div>
                 <span class="recurring-days ml-6 mt-1"
-                      th:style="${chore.schedule.toString().startsWith('OneTime')} ? 'display:none' : ''">
+                      th:style="${chore.schedule.isOneTime} ? 'display:none' : ''">
                     <span>every</span>
                     <input type="number" name="days"
-                           th:value="${chore.schedule.toString().startsWith('EveryNDays') ? chore.schedule.days : 7}"
-                           th:disabled="${chore.schedule.toString().startsWith('OneTime')}" required
+                           th:value="${!chore.schedule.isOneTime ? chore.schedule.days : 7}"
+                           th:disabled="${chore.schedule.isOneTime}" required
                            min="1"
                            class="w-16 p-1 border rounded text-center">
                     <span>days</span>
