@@ -1,7 +1,7 @@
 package com.domus.chores
 
-import com.domus.chores.adapters.persistence.InMemoryChoreRepository
 import com.domus.chores.adapters.web.dto.ChoreResponse
+import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.Schedule
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -24,7 +24,7 @@ class ChoreIntegrationTest {
     private lateinit var restTemplate: TestRestTemplate
 
     @Autowired
-    private lateinit var repository: InMemoryChoreRepository
+    private lateinit var repository: ChoreRepository
 
     @BeforeEach
     fun setUp() {

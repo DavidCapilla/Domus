@@ -1,0 +1,4 @@
+domus:
+  persistence:
+    csv:
+      path: ./target/test-chores.csv

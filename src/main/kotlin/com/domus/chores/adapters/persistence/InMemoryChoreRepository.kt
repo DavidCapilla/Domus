@@ -2,9 +2,7 @@ package com.domus.chores.adapters.persistence
 
 import com.domus.chores.core.Chore
 import com.domus.chores.core.ChoreRepository
-import org.springframework.stereotype.Repository
 
-@Repository
 class InMemoryChoreRepository() : ChoreRepository {
 
     private val chores: MutableSet<Chore> = HashSet()
