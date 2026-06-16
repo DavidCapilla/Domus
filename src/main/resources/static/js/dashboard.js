@@ -84,3 +84,80 @@ document.addEventListener('click', function (e) {
     var addModal = document.getElementById('add-chore-modal');
     if (e.target === addModal) closeModal();
 });
+
+function setupSwipeReveal() {
+    var state = { startX: 0, deltaX: 0, moved: false, container: null };
+
+    document.addEventListener('touchstart', function (e) {
+        var container = e.target.closest('.swipe-reveal-container');
+        if (!container || !e.target.closest('.swipe-reveal-content')) {
+            state.container = null;
+            return;
+        }
+        state.startX = e.touches[0].clientX;
+        state.deltaX = 0;
+        state.moved = false;
+        state.container = container;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function (e) {
+        if (!state.container) return;
+        var delta = state.startX - e.touches[0].clientX;
+        if (delta < 3) {
+            state.container.querySelector('.swipe-reveal-content').style.transform = '';
+            return;
+        }
+        e.preventDefault();
+        state.moved = true;
+        state.deltaX = delta;
+        var content = state.container.querySelector('.swipe-reveal-content');
+        var reveal = state.container.querySelector('.swipe-reveal-action');
+        var maxSwipe = reveal.offsetWidth;
+        content.style.transition = 'none';
+        content.style.transform = 'translateX(-' + Math.min(delta, maxSwipe) + 'px)';
+    }, { passive: false });
+
+    document.addEventListener('touchend', function () {
+        if (!state.container) return;
+        var container = state.container;
+        var content = container.querySelector('.swipe-reveal-content');
+        var reveal = container.querySelector('.swipe-reveal-action');
+        content.style.transition = 'transform 0.2s ease-out';
+
+        if (!state.moved || state.deltaX < 30) {
+            content.style.transform = '';
+            container.classList.remove('is-revealed');
+            state.container = null;
+            return;
+        }
+
+        var maxSwipe = reveal.offsetWidth;
+        if (state.deltaX > maxSwipe / 2) {
+            content.style.transform = 'translateX(-' + maxSwipe + 'px)';
+            container.classList.add('is-revealed');
+        } else {
+            content.style.transform = '';
+            container.classList.remove('is-revealed');
+        }
+        state.container = null;
+    });
+
+    document.addEventListener('click', function (e) {
+        var container = e.target.closest('.swipe-reveal-container');
+        document.querySelectorAll('.swipe-reveal-container.is-revealed').forEach(function (c) {
+            if (c !== container) {
+                c.querySelector('.swipe-reveal-content').style.transform = '';
+                c.classList.remove('is-revealed');
+            }
+        });
+    });
+}
+
+setupSwipeReveal();
+
+var origOpenDetail = window.openDetailModal;
+window.openDetailModal = function (el) {
+    var container = el.closest('.swipe-reveal-container');
+    if (container && container.classList.contains('is-revealed')) return;
+    origOpenDetail(el);
+};
