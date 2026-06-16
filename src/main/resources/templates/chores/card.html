@@ -1,28 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div th:fragment="chore-card(chore, status)" th:attr="data-chore-name=${chore.name},data-status=${status}"
-     onclick="openDetailModal(this)"
-     class="card border border-gray-200 rounded-lg p-3 flex-1 min-w-[200px] cursor-pointer hover:border-gray-400 hover:shadow-sm transition-shadow"
-     role="button" tabindex="0">
-    <div class="flex items-center gap-2 sm:flex-col sm:items-stretch sm:gap-1">
-        <div class="flex items-center gap-2 min-w-0 sm:justify-between">
-            <div class="flex items-center gap-1 min-w-0">
-                <span th:if="${!chore.schedule.isOneTime}" class="shrink-0 text-sm">🔁</span>
-                <span th:if="${chore.schedule.isOneTime}" class="shrink-0 text-sm">1️⃣</span>
-                <span class="font-semibold text-base truncate min-w-0" th:text="${chore.name}">name</span>
+<div th:fragment="chore-card(chore, status)"
+     class="swipe-reveal-container relative overflow-hidden rounded-lg flex-1 min-w-[200px]">
+    <div th:attr="data-chore-name=${chore.name},data-status=${status}"
+         onclick="openDetailModal(this)"
+         class="swipe-reveal-content relative z-10 bg-white card border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-gray-400 hover:shadow-sm transition-shadow"
+         role="button" tabindex="0">
+        <div class="flex items-center gap-2 sm:flex-col sm:items-stretch sm:gap-1">
+            <div class="flex items-center gap-2 min-w-0 sm:justify-between">
+                <div class="flex items-center gap-1 min-w-0">
+                    <span th:if="${!chore.schedule.isOneTime}" class="shrink-0 text-sm">🔁</span>
+                    <span th:if="${chore.schedule.isOneTime}" class="shrink-0 text-sm">1️⃣</span>
+                    <span class="font-semibold text-base truncate min-w-0" th:text="${chore.name}">name</span>
+                </div>
+                <span th:if="${status == 'overdue'}"
+                      class="shrink-0 text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full"
+                      th:text="|overdue ${today.toEpochDay() - chore.dueDate.toEpochDay()} day${today.toEpochDay() - chore.dueDate.toEpochDay() == 1 ? '' : 's'}|">overdue N days</span>
+                <span th:if="${status == 'due-today'}"
+                      class="shrink-0 text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">today</span>
+                <span th:if="${status == 'upcoming'}"
+                      class="shrink-0 text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full"
+                      th:text="|in ${chore.dueDate.toEpochDay() - today.toEpochDay()} day${chore.dueDate.toEpochDay() - today.toEpochDay() == 1 ? '' : 's'}|">in N days</span>
             </div>
-            <span th:if="${status == 'overdue'}"
-                  class="shrink-0 text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full"
-                  th:text="|overdue ${today.toEpochDay() - chore.dueDate.toEpochDay()} day${today.toEpochDay() - chore.dueDate.toEpochDay() == 1 ? '' : 's'}|">overdue N days</span>
-            <span th:if="${status == 'due-today'}"
-                  class="shrink-0 text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">today</span>
-            <span th:if="${status == 'upcoming'}"
-                  class="shrink-0 text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full"
-                  th:text="|in ${chore.dueDate.toEpochDay() - today.toEpochDay()} day${chore.dueDate.toEpochDay() - today.toEpochDay() == 1 ? '' : 's'}|">in N days</span>
+            <button th:attr="data-chore-name=${chore.name}" onclick="event.stopPropagation(); confirmComplete(this)"
+                    class="ml-auto sm:ml-0 shrink-0 px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 sm:self-end">Complete</button>
         </div>
-        <button th:attr="data-chore-name=${chore.name}" onclick="event.stopPropagation(); confirmComplete(this)"
-                class="ml-auto sm:ml-0 shrink-0 px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 sm:self-end">Complete</button>
+    </div>
+    <div class="swipe-reveal-action absolute inset-y-0 right-0 flex items-center z-0 bg-red-600 rounded-lg px-5">
+        <button th:attr="data-chore-name=${chore.name}" onclick="event.stopPropagation(); confirmDelete(this)"
+                class="text-white text-sm font-medium whitespace-nowrap">Delete</button>
     </div>
 </div>
 </body>
