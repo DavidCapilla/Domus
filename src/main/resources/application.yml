@@ -4,3 +4,8 @@ server:
 spring:
   application:
     name: domus
+
+domus:
+  persistence:
+    csv:
+      path: ./data/chores.csv
