@@ -2,6 +2,7 @@ package com.domus.chores.adapters.web.dto
 
 import com.domus.chores.core.Chore
 import com.domus.chores.core.Schedule
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.time.LocalDate
@@ -14,6 +15,17 @@ import java.time.LocalDate
 sealed interface ScheduleDto {
     data object OneTime : ScheduleDto
     data class EveryNDays(val days: Int) : ScheduleDto
+
+    @get:JsonIgnore
+    val displayName: String
+        get() = when (this) {
+            is OneTime -> "one time chore"
+            is EveryNDays -> "recurrent chore: every $days days"
+        }
+
+    @get:JsonIgnore
+    val isOneTime: Boolean
+        get() = this is OneTime
 }
 
 fun ScheduleDto.toDomain() = when (this) {

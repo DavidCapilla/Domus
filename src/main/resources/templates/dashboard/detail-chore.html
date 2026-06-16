@@ -12,7 +12,7 @@
     </div>
     <div class="mb-6">
         <label class="block text-sm font-medium text-gray-600 mb-1">Schedule</label>
-        <div th:text="${chore.schedule}">schedule</div>
+        <div th:text="${chore.schedule.displayName}">schedule</div>
     </div>
     <div class="flex gap-2 pt-2 border-t">
         <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#edit-modal-content" hx-swap="innerHTML"

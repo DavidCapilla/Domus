@@ -8,8 +8,8 @@
     <div class="flex items-center gap-2 sm:flex-col sm:items-stretch sm:gap-1">
         <div class="flex items-center gap-2 min-w-0 sm:justify-between">
             <div class="flex items-center gap-1 min-w-0">
-                <span th:if="${chore.schedule.toString().startsWith('EveryNDays')}" class="shrink-0 text-sm">🔁</span>
-                <span th:if="${chore.schedule.toString().startsWith('OneTime')}" class="shrink-0 text-sm">1️⃣</span>
+                <span th:if="${!chore.schedule.isOneTime}" class="shrink-0 text-sm">🔁</span>
+                <span th:if="${chore.schedule.isOneTime}" class="shrink-0 text-sm">1️⃣</span>
                 <span class="font-semibold text-base truncate min-w-0" th:text="${chore.name}">name</span>
             </div>
             <span th:if="${status == 'overdue'}"
