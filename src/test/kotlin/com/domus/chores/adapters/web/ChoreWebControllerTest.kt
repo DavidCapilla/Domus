@@ -218,6 +218,16 @@ class ChoreWebControllerTest {
         }
 
         @Test
+        fun `returns error message when chore already exists`() {
+            mockMvc.perform(post("/chores")
+                .param("name", "Placeholder chore")
+                .param("dueDate", "2026-06-20")
+                .param("scheduleType", "one_time"))
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("A chore with this name already exists")))
+        }
+
+        @Test
         fun `returns fragment without html wrapping`() {
             mockMvc.perform(post("/chores")
                 .param("name", "Fragment test")
@@ -246,9 +256,10 @@ class ChoreWebControllerTest {
         }
 
         @Test
-        fun `returns 404 for non-existent chore`() {
+        fun `returns error message for non-existent chore`() {
             mockMvc.perform(get("/chores/{name}/edit", "Non-existent"))
-                .andExpect(status().isNotFound)
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("Chore not found")))
         }
     }
 
@@ -297,9 +308,10 @@ class ChoreWebControllerTest {
         }
 
         @Test
-        fun `returns 404 for non-existent chore`() {
+        fun `returns error message for non-existent chore`() {
             mockMvc.perform(get("/chores/{name}/detail", "Non-existent"))
-                .andExpect(status().isNotFound)
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("Chore not found")))
         }
     }
 
