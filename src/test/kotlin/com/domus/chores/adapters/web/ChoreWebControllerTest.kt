@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDate
 
@@ -194,7 +195,7 @@ class ChoreWebControllerTest {
                 .param("name", "")
                 .param("dueDate", "2026-06-20")
                 .param("scheduleType", "one_time"))
-                .andExpect(content().string(containsString("Name is required")))
+                .andExpect(header().string("HX-Trigger", containsString("Name is required")))
         }
 
         @Test
@@ -204,7 +205,7 @@ class ChoreWebControllerTest {
                 .param("dueDate", "2026-06-20")
                 .param("scheduleType", "every_n_days")
                 .param("days", ""))
-                .andExpect(content().string(containsString("Days must be a positive number")))
+                .andExpect(header().string("HX-Trigger", containsString("Days must be a positive number")))
         }
 
         @Test
@@ -214,7 +215,7 @@ class ChoreWebControllerTest {
                 .param("dueDate", "2026-06-20")
                 .param("scheduleType", "every_n_days")
                 .param("days", "0"))
-                .andExpect(content().string(containsString("Days must be a positive number")))
+                .andExpect(header().string("HX-Trigger", containsString("Days must be a positive number")))
         }
 
         @Test
@@ -224,7 +225,7 @@ class ChoreWebControllerTest {
                 .param("dueDate", "2026-06-20")
                 .param("scheduleType", "one_time"))
                 .andExpect(status().isOk)
-                .andExpect(content().string(containsString("A chore with this name already exists")))
+                .andExpect(header().string("HX-Trigger", containsString("A chore with this name already exists")))
         }
 
         @Test
@@ -283,7 +284,7 @@ class ChoreWebControllerTest {
                 .param("newName", "")
                 .param("dueDate", "2026-06-25")
                 .param("scheduleType", "one_time"))
-                .andExpect(content().string(containsString("Name is required")))
+                .andExpect(header().string("HX-Trigger", containsString("Name is required")))
         }
     }
 

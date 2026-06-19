@@ -11,6 +11,7 @@ import com.domus.chores.application.GetDashboardUseCase
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreNotFoundException
 import com.domus.chores.core.Schedule
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import org.springframework.stereotype.Controller
@@ -54,9 +55,10 @@ class ChoreWebController(
         @RequestParam scheduleType: String,
         @RequestParam(required = false) days: String?,
         model: Model,
+        response: HttpServletResponse,
     ): String {
         if (name.isBlank()) {
-            model.addAttribute("error", "Name is required")
+            toast(response, "Name is required")
             model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
             return "dashboard/list :: chore-list"
         }
@@ -65,7 +67,7 @@ class ChoreWebController(
             "every_n_days" -> {
                 val daysInt = days?.toIntOrNull()
                 if (daysInt == null || daysInt <= 0) {
-                    model.addAttribute("error", "Days must be a positive number")
+                    toast(response, "Days must be a positive number")
                     model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
                     return "dashboard/list :: chore-list"
                 }
@@ -77,7 +79,7 @@ class ChoreWebController(
         try {
             createChoreUseCase.addChore(name = name, dueDate = dueDate, schedule = schedule)
         } catch (e: ChoreAlreadyExistsException) {
-            model.addAttribute("error", "A chore with this name already exists")
+            toast(response, "A chore with this name already exists")
             model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
             return "dashboard/list :: chore-list"
         }
@@ -115,9 +117,10 @@ class ChoreWebController(
         @RequestParam scheduleType: String,
         @RequestParam(required = false) days: String?,
         model: Model,
+        response: HttpServletResponse,
     ): String {
         if (newName.isBlank()) {
-            model.addAttribute("error", "Name is required")
+            toast(response, "Name is required")
             model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
             return "dashboard/list :: chore-list"
         }
@@ -126,7 +129,7 @@ class ChoreWebController(
             "every_n_days" -> {
                 val daysInt = days?.toIntOrNull()
                 if (daysInt == null || daysInt <= 0) {
-                    model.addAttribute("error", "Days must be a positive number")
+                    toast(response, "Days must be a positive number")
                     model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
                     return "dashboard/list :: chore-list"
                 }
@@ -143,11 +146,11 @@ class ChoreWebController(
                 schedule = schedule
             )
         } catch (e: ChoreAlreadyExistsException) {
-            model.addAttribute("error", "A chore with this name already exists")
+            toast(response, "A chore with this name already exists")
             model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
             return "dashboard/list :: chore-list"
         } catch (e: ChoreNotFoundException) {
-            model.addAttribute("error", "Chore not found. It may have been deleted.")
+            toast(response, "Chore not found.")
             model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
             return "dashboard/list :: chore-list"
         }
@@ -156,11 +159,11 @@ class ChoreWebController(
     }
 
     @PostMapping("/chores/{name}/complete")
-    fun completeChore(@PathVariable name: String, model: Model): String {
+    fun completeChore(@PathVariable name: String, model: Model, response: HttpServletResponse): String {
         try {
             completeChoreUseCase.completeChore(name)
         } catch (e: ChoreNotFoundException) {
-            model.addAttribute("error", "Chore not found. It may have been deleted.")
+            toast(response, "Chore not found.")
             model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
             return "dashboard/list :: chore-list"
         }
@@ -169,15 +172,19 @@ class ChoreWebController(
     }
 
     @DeleteMapping("/chores/{name}")
-    fun deleteChore(@PathVariable name: String, model: Model): String {
+    fun deleteChore(@PathVariable name: String, model: Model, response: HttpServletResponse): String {
         try {
             deleteChoreUseCase.deleteChore(name)
         } catch (e: ChoreNotFoundException) {
-            model.addAttribute("error", "Chore not found.")
+            toast(response, "Chore not found.")
             model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
             return "dashboard/list :: chore-list"
         }
         model.addAttribute("dashboard", DashboardResponse.fromDomain(getDashboardUseCase.getDashboard()))
         return "dashboard/list :: chore-list"
+    }
+
+    private fun toast(response: HttpServletResponse, message: String) {
+        response.addHeader("HX-Trigger", """{"showToast":"$message"}""")
     }
 }
