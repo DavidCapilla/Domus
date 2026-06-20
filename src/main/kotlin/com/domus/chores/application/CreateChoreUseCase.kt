@@ -2,6 +2,7 @@ package com.domus.chores.application
 
 import com.domus.chores.core.Chore
 import com.domus.chores.core.ChoreAlreadyExistsException
+import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.Schedule
 import org.slf4j.LoggerFactory
@@ -18,7 +19,7 @@ class CreateChoreUseCase(val choreRepository: ChoreRepository) {
 
     fun addChore(name: String, dueDate: LocalDate, schedule: Schedule) {
         val chore =
-            Chore(id = UUID.randomUUID(), name = name, dueDate = dueDate, schedule = schedule)
+            Chore(id = UUID.randomUUID(), name = ChoreName.of(name), dueDate = dueDate, schedule = schedule)
         if (!choreRepository.save(chore)) {
             log.warn("Chore not created: name already exists [name={}]", name)
             throw ChoreAlreadyExistsException(name)

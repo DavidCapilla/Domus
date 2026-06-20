@@ -1,6 +1,7 @@
 package com.domus.chores
 
 import com.domus.chores.adapters.web.dto.ChoreResponse
+import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.Schedule
 import org.assertj.core.api.Assertions.assertThat
@@ -121,7 +122,7 @@ class ChoreIntegrationTest {
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(repository.findByName("One-off task")).isNull()
+        assertThat(repository.findByName(ChoreName.of("One-off task"))).isNull()
     }
 
     @Test
@@ -137,7 +138,7 @@ class ChoreIntegrationTest {
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val updated = repository.findByName("Recurring task")
+        val updated = repository.findByName(ChoreName.of("Recurring task"))
         assertThat(updated).isNotNull
         assertThat(updated!!.dueDate).isEqualTo(LocalDate.now().plusDays(7))
     }
@@ -179,5 +180,30 @@ class ChoreIntegrationTest {
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
+    }
+
+    @Test
+    fun `addChore with trailing space saves trimmed name and allows update`() {
+        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val dueDate = LocalDate.now().plusDays(10).toString()
+
+        val postResponse = restTemplate.postForEntity(
+            "/api/chores",
+            HttpEntity("""{"name":" Take out trash ","dueDate":"$dueDate"}""", headers),
+            String::class.java,
+        )
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.OK)
+
+        val trimmed = repository.findByName(ChoreName.of("Take out trash"))
+        assertThat(trimmed).isNotNull
+
+        val updateResponse = restTemplate.exchange(
+            "/api/chores/{name}",
+            HttpMethod.PUT,
+            HttpEntity("""{"name":"Take out trash","dueDate":"$dueDate"}""", headers),
+            ChoreResponse::class.java,
+            "Take out trash",
+        )
+        assertThat(updateResponse.statusCode).isEqualTo(HttpStatus.OK)
     }
 }

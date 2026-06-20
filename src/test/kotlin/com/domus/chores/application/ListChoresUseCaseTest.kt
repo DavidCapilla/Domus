@@ -1,5 +1,6 @@
 package com.domus.chores.application
 
+import com.domus.chores.core.ChoreName
 import com.domus.chores.createChore
 import com.domus.chores.core.ChoreRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -23,8 +24,8 @@ class ListChoresUseCaseTest {
     fun `getChores returns chores from repository`() {
         val result = useCase.getChores()
         assertEquals(2, result.size)
-        assertTrue(result.any { it.name == "Clean kitchen" })
-        assertTrue(result.any { it.name == "Do laundry" })
+        assertTrue(result.any { it.name == ChoreName.of("Clean kitchen") })
+        assertTrue(result.any { it.name == ChoreName.of("Do laundry") })
     }
 
     @Test

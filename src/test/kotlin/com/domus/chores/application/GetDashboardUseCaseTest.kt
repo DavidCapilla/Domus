@@ -1,5 +1,6 @@
 package com.domus.chores.application
 
+import com.domus.chores.core.ChoreName
 import com.domus.chores.createChore
 import com.domus.chores.core.ChoreRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -44,7 +45,7 @@ class GetDashboardUseCaseTest {
         val dashboard = useCase.getDashboard()
 
         assertEquals(1, dashboard.overdue.size)
-        assertEquals("Overdue", dashboard.overdue[0].name)
+        assertEquals(ChoreName.of("Overdue"), dashboard.overdue[0].name)
         assertTrue(dashboard.dueToday.isEmpty())
         assertTrue(dashboard.upcoming.isEmpty())
     }
@@ -56,7 +57,7 @@ class GetDashboardUseCaseTest {
         val dashboard = useCase.getDashboard()
 
         assertEquals(1, dashboard.dueToday.size)
-        assertEquals("Due today", dashboard.dueToday[0].name)
+        assertEquals(ChoreName.of("Due today"), dashboard.dueToday[0].name)
         assertTrue(dashboard.overdue.isEmpty())
         assertTrue(dashboard.upcoming.isEmpty())
     }
@@ -68,7 +69,7 @@ class GetDashboardUseCaseTest {
         val dashboard = useCase.getDashboard()
 
         assertEquals(1, dashboard.upcoming.size)
-        assertEquals("Upcoming", dashboard.upcoming[0].name)
+        assertEquals(ChoreName.of("Upcoming"), dashboard.upcoming[0].name)
         assertTrue(dashboard.overdue.isEmpty())
         assertTrue(dashboard.dueToday.isEmpty())
     }
@@ -80,10 +81,10 @@ class GetDashboardUseCaseTest {
         val dashboard = useCase.getDashboard()
 
         assertEquals(1, dashboard.overdue.size)
-        assertEquals("Overdue", dashboard.overdue[0].name)
+        assertEquals(ChoreName.of("Overdue"), dashboard.overdue[0].name)
         assertEquals(1, dashboard.dueToday.size)
-        assertEquals("Due today", dashboard.dueToday[0].name)
+        assertEquals(ChoreName.of("Due today"), dashboard.dueToday[0].name)
         assertEquals(1, dashboard.upcoming.size)
-        assertEquals("Upcoming", dashboard.upcoming[0].name)
+        assertEquals(ChoreName.of("Upcoming"), dashboard.upcoming[0].name)
     }
 }

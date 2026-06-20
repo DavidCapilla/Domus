@@ -1,6 +1,7 @@
 package com.domus.chores.adapters.persistence
 
 import com.domus.chores.core.Chore
+import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.Schedule
 import org.springframework.beans.factory.annotation.Value
@@ -23,7 +24,7 @@ class CsvChoreRepository(
                 val parts = line.split(",", limit = 5)
                 Chore(
                     id = UUID.fromString(parts[0]),
-                    name = parts[1],
+                    name = ChoreName.of(parts[1]),
                     dueDate = LocalDate.parse(parts[2]),
                     schedule = when (parts[3]) {
                         "one_time" -> Schedule.OneTime
@@ -47,14 +48,14 @@ class CsvChoreRepository(
             is Schedule.OneTime -> "one_time" to ""
             is Schedule.EveryNDays -> "every_n_days" to s.days.toString()
         }
-        return listOf(id.toString(), name, dueDate.toString(), scheduleType, days).joinToString(",")
+        return listOf(id.toString(), name.value, dueDate.toString(), scheduleType, days).joinToString(",")
     }
 
     @Synchronized
     override fun findAll(): List<Chore> = readAll()
 
     @Synchronized
-    override fun findByName(name: String): Chore? = readAll().find { it.name == name }
+    override fun findByName(name: ChoreName): Chore? = readAll().find { it.name == name }
 
     @Synchronized
     override fun save(chore: Chore): Boolean {
@@ -66,7 +67,7 @@ class CsvChoreRepository(
     }
 
     @Synchronized
-    override fun update(currentName: String, chore: Chore): Boolean {
+    override fun update(currentName: ChoreName, chore: Chore): Boolean {
         val chores = readAll().toMutableList()
         val index = chores.indexOfFirst { it.name == currentName }
         if (index == -1) return false
@@ -76,7 +77,7 @@ class CsvChoreRepository(
     }
 
     @Synchronized
-    override fun delete(choreName: String): Boolean {
+    override fun delete(choreName: ChoreName): Boolean {
         val chores = readAll().toMutableList()
         val removed = chores.removeAll { it.name == choreName }
         if (removed) writeAll(chores)

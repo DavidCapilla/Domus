@@ -1,6 +1,7 @@
 package com.domus.chores.application
 
 import com.domus.chores.core.ChoreAlreadyExistsException
+import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.Schedule
 import org.junit.jupiter.api.Test
@@ -24,7 +25,7 @@ class CreateChoreUseCaseTest {
         whenever(repository.save(any())).doReturn(true)
         useCase.addChore("Take out trash", dueDate, Schedule.OneTime)
         verify(repository).save(argThat { chore ->
-            (chore.name == "Take out trash"
+            (chore.name == ChoreName.of("Take out trash")
                     && chore.dueDate.isEqual(dueDate)
                     && chore.schedule == Schedule.OneTime)
         })

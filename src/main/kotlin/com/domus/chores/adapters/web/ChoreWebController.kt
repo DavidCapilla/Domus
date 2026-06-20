@@ -9,6 +9,7 @@ import com.domus.chores.application.ListChoresUseCase
 import com.domus.chores.application.UpdateChoreUseCase
 import com.domus.chores.application.GetDashboardUseCase
 import com.domus.chores.core.ChoreAlreadyExistsException
+import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreNotFoundException
 import jakarta.servlet.http.HttpServletResponse
 import java.time.LocalDate
@@ -72,7 +73,7 @@ class ChoreWebController(
 
     @GetMapping("/chores/{name}/edit")
     fun editChoreForm(@PathVariable name: String, model: Model): String {
-        val chore = listChoresUseCase.getChores().find { it.name == name }
+        val chore = listChoresUseCase.getChores().find { it.name == ChoreName.of(name) }
         if (chore == null) {
             model.addAttribute("error", "Chore not found")
             return "fragments/error :: error-message"
@@ -83,7 +84,8 @@ class ChoreWebController(
 
     @GetMapping("/chores/{name}/detail")
     fun choreDetail(@PathVariable name: String, model: Model): String {
-        val chore = listChoresUseCase.getChores().find { it.name == name }
+        // todo Domain leak
+        val chore = listChoresUseCase.getChores().find { it.name == ChoreName.of(name) }
         if (chore == null) {
             model.addAttribute("error", "Chore not found")
             return "fragments/error :: error-message"
