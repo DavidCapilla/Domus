@@ -11,14 +11,12 @@ import com.domus.chores.application.GetDashboardUseCase
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreNotFoundException
 import com.domus.chores.core.Schedule
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.format.annotation.DateTimeFormat
-import org.springframework.http.HttpStatus
 import java.time.LocalDate
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -55,9 +53,10 @@ class ChoreWebController(
         @RequestParam scheduleType: String,
         @RequestParam(required = false) days: String?,
         model: Model,
+        response: HttpServletResponse,
     ): String {
         if (name.isBlank()) {
-            model.addAttribute("error", "Name is required")
+            toast(response, "Name is required")
             return "dashboard/list :: chore-list"
         }
         val schedule = when (scheduleType) {
@@ -65,7 +64,7 @@ class ChoreWebController(
             "every_n_days" -> {
                 val daysInt = days?.toIntOrNull()
                 if (daysInt == null || daysInt <= 0) {
-                    model.addAttribute("error", "Days must be a positive number")
+                    toast(response, "Days must be a positive number")
                     return "dashboard/list :: chore-list"
                 }
                 Schedule.EveryNDays(daysInt)
@@ -73,7 +72,13 @@ class ChoreWebController(
 
             else -> throw IllegalArgumentException("Unknown schedule type: $scheduleType")
         }
-        createChoreUseCase.addChore(name = name, dueDate = dueDate, schedule = schedule)
+        try {
+            createChoreUseCase.addChore(name = name, dueDate = dueDate, schedule = schedule)
+        } catch (e: ChoreAlreadyExistsException) {
+            toast(response, "A chore with this name already exists")
+            model.addAttribute("dashboard", dashboard())
+            return "dashboard/list :: chore-list"
+        }
         model.addAttribute("dashboard", dashboard())
         return "dashboard/list :: chore-list"
     }
@@ -81,7 +86,10 @@ class ChoreWebController(
     @GetMapping("/chores/{name}/edit")
     fun editChoreForm(@PathVariable name: String, model: Model): String {
         val chore = listChoresUseCase.getChores().find { it.name == name }
-            ?: throw ChoreNotFoundException(name)
+        if (chore == null) {
+            model.addAttribute("error", "Chore not found")
+            return "fragments/error :: error-message"
+        }
         model.addAttribute("chore", ChoreResponse.fromDomain(chore))
         return "dashboard/edit-chore :: chore-edit"
     }
@@ -89,7 +97,10 @@ class ChoreWebController(
     @GetMapping("/chores/{name}/detail")
     fun choreDetail(@PathVariable name: String, model: Model): String {
         val chore = listChoresUseCase.getChores().find { it.name == name }
-            ?: throw ChoreNotFoundException(name)
+        if (chore == null) {
+            model.addAttribute("error", "Chore not found")
+            return "fragments/error :: error-message"
+        }
         model.addAttribute("chore", ChoreResponse.fromDomain(chore))
         return "dashboard/detail-chore :: chore-detail"
     }
@@ -102,9 +113,10 @@ class ChoreWebController(
         @RequestParam scheduleType: String,
         @RequestParam(required = false) days: String?,
         model: Model,
+        response: HttpServletResponse,
     ): String {
         if (newName.isBlank()) {
-            model.addAttribute("error", "Name is required")
+            toast(response, "Name is required")
             return "dashboard/list :: chore-list"
         }
         val schedule = when (scheduleType) {
@@ -112,7 +124,7 @@ class ChoreWebController(
             "every_n_days" -> {
                 val daysInt = days?.toIntOrNull()
                 if (daysInt == null || daysInt <= 0) {
-                    model.addAttribute("error", "Days must be a positive number")
+                    toast(response, "Days must be a positive number")
                     return "dashboard/list :: chore-list"
                 }
                 Schedule.EveryNDays(daysInt)
@@ -120,35 +132,53 @@ class ChoreWebController(
 
             else -> throw IllegalArgumentException("Unknown schedule type: $scheduleType")
         }
-        updateChoreUseCase.updateChore(
-            currentName = name,
-            newName = newName,
-            dueDate = dueDate,
-            schedule = schedule
-        )
+        try {
+            updateChoreUseCase.updateChore(
+                currentName = name,
+                newName = newName,
+                dueDate = dueDate,
+                schedule = schedule
+            )
+        } catch (e: ChoreAlreadyExistsException) {
+            toast(response, "A chore with this name already exists")
+            model.addAttribute("dashboard", dashboard())
+            return "dashboard/list :: chore-list"
+        } catch (e: ChoreNotFoundException) {
+            toast(response, "Chore not found.")
+            model.addAttribute("dashboard", dashboard())
+            return "dashboard/list :: chore-list"
+        }
         model.addAttribute("dashboard", dashboard())
         return "dashboard/list :: chore-list"
     }
 
     @PostMapping("/chores/{name}/complete")
-    fun completeChore(@PathVariable name: String, model: Model): String {
-        completeChoreUseCase.completeChore(name)
+    fun completeChore(@PathVariable name: String, model: Model, response: HttpServletResponse): String {
+        try {
+            completeChoreUseCase.completeChore(name)
+        } catch (e: ChoreNotFoundException) {
+            toast(response, "Chore not found.")
+            model.addAttribute("dashboard", dashboard())
+            return "dashboard/list :: chore-list"
+        }
         model.addAttribute("dashboard", dashboard())
         return "dashboard/list :: chore-list"
     }
 
     @DeleteMapping("/chores/{name}")
-    fun deleteChore(@PathVariable name: String, model: Model): String {
-        deleteChoreUseCase.deleteChore(name)
+    fun deleteChore(@PathVariable name: String, model: Model, response: HttpServletResponse): String {
+        try {
+            deleteChoreUseCase.deleteChore(name)
+        } catch (e: ChoreNotFoundException) {
+            toast(response, "Chore not found.")
+            model.addAttribute("dashboard", dashboard())
+            return "dashboard/list :: chore-list"
+        }
         model.addAttribute("dashboard", dashboard())
         return "dashboard/list :: chore-list"
     }
 
-    @ExceptionHandler(ChoreAlreadyExistsException::class)
-    fun handleChoreAlreadyExists(): ResponseEntity<String> =
-        ResponseEntity("Chore already exists", HttpStatus.CONFLICT)
-
-    @ExceptionHandler(ChoreNotFoundException::class)
-    fun handleChoreNotFound(): ResponseEntity<String> =
-        ResponseEntity("Chore not found", HttpStatus.NOT_FOUND)
+    private fun toast(response: HttpServletResponse, message: String) {
+        response.addHeader("HX-Trigger", """{"showToast":"$message"}""")
+    }
 }

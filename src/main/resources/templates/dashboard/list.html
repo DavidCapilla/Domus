@@ -2,8 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div id="chore-list" th:fragment="chore-list">
-    <div th:if="${error}" class="text-red-600 p-2" th:text="${error}">error</div>
-
     <div class="mb-6 overdue-section">
         <h2 class="text-lg font-semibold mb-2">Overdue</h2>
         <div th:if="${dashboard.overdue.isEmpty()}" class="text-gray-500 italic py-2">No overdue chores</div>

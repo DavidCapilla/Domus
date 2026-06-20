@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDate
 
@@ -194,7 +195,7 @@ class ChoreWebControllerTest {
                 .param("name", "")
                 .param("dueDate", "2026-06-20")
                 .param("scheduleType", "one_time"))
-                .andExpect(content().string(containsString("Name is required")))
+                .andExpect(header().string("HX-Trigger", containsString("Name is required")))
         }
 
         @Test
@@ -204,7 +205,7 @@ class ChoreWebControllerTest {
                 .param("dueDate", "2026-06-20")
                 .param("scheduleType", "every_n_days")
                 .param("days", ""))
-                .andExpect(content().string(containsString("Days must be a positive number")))
+                .andExpect(header().string("HX-Trigger", containsString("Days must be a positive number")))
         }
 
         @Test
@@ -214,7 +215,17 @@ class ChoreWebControllerTest {
                 .param("dueDate", "2026-06-20")
                 .param("scheduleType", "every_n_days")
                 .param("days", "0"))
-                .andExpect(content().string(containsString("Days must be a positive number")))
+                .andExpect(header().string("HX-Trigger", containsString("Days must be a positive number")))
+        }
+
+        @Test
+        fun `returns error message when chore already exists`() {
+            mockMvc.perform(post("/chores")
+                .param("name", "Placeholder chore")
+                .param("dueDate", "2026-06-20")
+                .param("scheduleType", "one_time"))
+                .andExpect(status().isOk)
+                .andExpect(header().string("HX-Trigger", containsString("A chore with this name already exists")))
         }
 
         @Test
@@ -246,9 +257,10 @@ class ChoreWebControllerTest {
         }
 
         @Test
-        fun `returns 404 for non-existent chore`() {
+        fun `returns error message for non-existent chore`() {
             mockMvc.perform(get("/chores/{name}/edit", "Non-existent"))
-                .andExpect(status().isNotFound)
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("Chore not found")))
         }
     }
 
@@ -272,7 +284,7 @@ class ChoreWebControllerTest {
                 .param("newName", "")
                 .param("dueDate", "2026-06-25")
                 .param("scheduleType", "one_time"))
-                .andExpect(content().string(containsString("Name is required")))
+                .andExpect(header().string("HX-Trigger", containsString("Name is required")))
         }
     }
 
@@ -297,9 +309,10 @@ class ChoreWebControllerTest {
         }
 
         @Test
-        fun `returns 404 for non-existent chore`() {
+        fun `returns error message for non-existent chore`() {
             mockMvc.perform(get("/chores/{name}/detail", "Non-existent"))
-                .andExpect(status().isNotFound)
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("Chore not found")))
         }
     }
 

@@ -80,9 +80,34 @@ function closeDetailModal() {
     document.getElementById('detail-chore-modal').classList.add('hidden');
 }
 
+var toastTimer = null;
+
+function showToast(message) {
+    var toast = document.getElementById('toast');
+    var msg = document.getElementById('toast-message');
+    if (!toast || !msg) return;
+    msg.textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(function () { toast.classList.add('opacity-100'); }, 10);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(dismissToast, 5000);
+}
+
+function dismissToast() {
+    var toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.classList.remove('opacity-100');
+    setTimeout(function () { toast.classList.add('hidden'); }, 300);
+    clearTimeout(toastTimer);
+}
+
 document.addEventListener('click', function (e) {
     var addModal = document.getElementById('add-chore-modal');
     if (e.target === addModal) closeModal();
+});
+
+document.addEventListener('showToast', function (e) {
+    showToast(e.detail.value);
 });
 
 function setupSwipeReveal() {
