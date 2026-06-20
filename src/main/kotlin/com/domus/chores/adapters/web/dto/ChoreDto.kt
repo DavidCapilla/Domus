@@ -5,6 +5,8 @@ import com.domus.chores.core.Schedule
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
@@ -39,7 +41,9 @@ fun Schedule.toDto() = when (this) {
 }
 
 data class ChoreRequest(
+    @field:NotBlank
     val name: String,
+    @field:NotNull
     val dueDate: LocalDate,
     val schedule: ScheduleDto = ScheduleDto.OneTime,
 )
