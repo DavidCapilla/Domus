@@ -55,7 +55,7 @@ data class ChoreResponse(
 ) {
     companion object {
         fun fromDomain(chore: Chore) = ChoreResponse(
-            name = chore.name,
+            name = chore.name.value,
             dueDate = chore.dueDate,
             schedule = chore.schedule.toDto(),
         )

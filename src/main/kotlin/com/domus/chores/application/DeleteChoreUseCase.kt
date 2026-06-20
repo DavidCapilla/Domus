@@ -1,5 +1,6 @@
 package com.domus.chores.application
 
+import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreNotFoundException
 import com.domus.chores.core.ChoreRepository
 import org.slf4j.LoggerFactory
@@ -13,7 +14,7 @@ class DeleteChoreUseCase(val choreRepository: ChoreRepository) {
     }
 
     fun deleteChore(choreName: String) {
-        if (!choreRepository.delete(choreName)) {
+        if (!choreRepository.delete(ChoreName.of(choreName))) {
             log.warn("Chore not found for deletion [name={}]", choreName)
             throw ChoreNotFoundException(choreName)
         }

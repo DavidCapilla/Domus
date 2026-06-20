@@ -1,6 +1,7 @@
 package com.domus.chores
 
 import com.domus.chores.adapters.web.dto.ChoreResponse
+import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.Schedule
 import org.assertj.core.api.Assertions.assertThat
@@ -121,7 +122,7 @@ class ChoreIntegrationTest {
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(repository.findByName("One-off task")).isNull()
+        assertThat(repository.findByName(ChoreName.of("One-off task"))).isNull()
     }
 
     @Test
@@ -137,7 +138,7 @@ class ChoreIntegrationTest {
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val updated = repository.findByName("Recurring task")
+        val updated = repository.findByName(ChoreName.of("Recurring task"))
         assertThat(updated).isNotNull
         assertThat(updated!!.dueDate).isEqualTo(LocalDate.now().plusDays(7))
     }
@@ -193,7 +194,7 @@ class ChoreIntegrationTest {
         )
         assertThat(postResponse.statusCode).isEqualTo(HttpStatus.OK)
 
-        val trimmed = repository.findByName("Take out trash")
+        val trimmed = repository.findByName(ChoreName.of("Take out trash"))
         assertThat(trimmed).isNotNull
 
         val updateResponse = restTemplate.exchange(

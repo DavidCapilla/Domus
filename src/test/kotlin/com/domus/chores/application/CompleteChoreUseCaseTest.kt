@@ -1,5 +1,6 @@
 package com.domus.chores.application
 
+import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreNotFoundException
 import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.CompletionOutcome
@@ -24,20 +25,20 @@ class CompleteChoreUseCaseTest {
     @Test
     fun `completeChore deletes one-time chore`() {
         val chore = createChore(name = "Clean kitchen", schedule = Schedule.OneTime)
-        whenever(repository.findByName("Clean kitchen")).doReturn(chore)
-        whenever(repository.delete("Clean kitchen")).doReturn(true)
+        whenever(repository.findByName(ChoreName.of("Clean kitchen"))).doReturn(chore)
+        whenever(repository.delete(ChoreName.of("Clean kitchen"))).doReturn(true)
 
         val outcome = useCase.completeChore("Clean kitchen")
 
         assertEquals(CompletionOutcome.Finished, outcome)
-        verify(repository).delete("Clean kitchen")
+        verify(repository).delete(ChoreName.of("Clean kitchen"))
         verify(repository, never()).update(any(), any())
     }
 
     @Test
     fun `completeChore reschedules every-N-days chore`() {
         val chore = createChore(name = "Water plants", schedule = Schedule.EveryNDays(3))
-        whenever(repository.findByName("Water plants")).doReturn(chore)
+        whenever(repository.findByName(ChoreName.of("Water plants"))).doReturn(chore)
         whenever(repository.update(any(), any())).doReturn(true)
 
         val outcome = useCase.completeChore("Water plants")
@@ -46,12 +47,12 @@ class CompleteChoreUseCaseTest {
         assertEquals(chore.id, continued.chore.id)
         assertEquals(LocalDate.now().plusDays(3), continued.chore.dueDate)
         verify(repository, never()).delete(any())
-        verify(repository).update("Water plants", continued.chore)
+        verify(repository).update(ChoreName.of("Water plants"), continued.chore)
     }
 
     @Test
     fun `completeChore throws when chore not found`() {
-        whenever(repository.findByName("Non-existent")).doReturn(null)
+        whenever(repository.findByName(ChoreName.of("Non-existent"))).doReturn(null)
 
         assertThrows(ChoreNotFoundException::class.java) {
             useCase.completeChore("Non-existent")

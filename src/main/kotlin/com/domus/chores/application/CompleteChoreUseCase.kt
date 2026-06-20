@@ -1,5 +1,6 @@
 package com.domus.chores.application
 
+import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreNotFoundException
 import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.CompletionOutcome
@@ -15,7 +16,8 @@ class CompleteChoreUseCase(val choreRepository: ChoreRepository) {
     }
 
     fun completeChore(name: String): CompletionOutcome {
-        val chore = choreRepository.findByName(name)
+        val choreName = ChoreName.of(name)
+        val chore = choreRepository.findByName(choreName)
         if (chore == null) {
             log.warn("Chore not found for completion [name={}]", name)
             throw ChoreNotFoundException(name)
@@ -23,11 +25,11 @@ class CompleteChoreUseCase(val choreRepository: ChoreRepository) {
         val outcome = chore.complete(LocalDate.now())
         when (outcome) {
             is CompletionOutcome.Finished -> {
-                choreRepository.delete(name)
+                choreRepository.delete(choreName)
                 log.info("Chore completed and removed [name={}]", name)
             }
             is CompletionOutcome.Continued -> {
-                choreRepository.update(name, outcome.chore)
+                choreRepository.update(choreName, outcome.chore)
                 log.info("Chore completed and rescheduled [name={}, nextDueDate={}]", name, outcome.chore.dueDate)
             }
         }
