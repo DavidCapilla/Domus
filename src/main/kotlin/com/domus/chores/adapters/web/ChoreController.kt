@@ -10,8 +10,11 @@ import com.domus.chores.application.ListChoresUseCase
 import com.domus.chores.application.UpdateChoreUseCase
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreNotFoundException
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/chores")
+@Validated
 class ChoreController(
     private val listChoresUseCase: ListChoresUseCase,
     private val createChoreUseCase: CreateChoreUseCase,
@@ -38,7 +42,7 @@ class ChoreController(
     }
 
     @PostMapping
-    fun addChore(@RequestBody request: ChoreRequest) {
+    fun addChore(@Valid @RequestBody request: ChoreRequest) {
         createChoreUseCase.addChore(
             name = request.name,
             dueDate = request.dueDate,
@@ -47,12 +51,12 @@ class ChoreController(
     }
 
     @PostMapping("/{name}/complete")
-    fun completeChore(@PathVariable name: String) {
+    fun completeChore(@NotBlank @PathVariable name: String) {
         completeChoreUseCase.completeChore(name)
     }
 
     @PutMapping("/{name}")
-    fun updateChore(@PathVariable name: String, @RequestBody request: ChoreRequest): ChoreResponse {
+    fun updateChore(@NotBlank @PathVariable name: String, @Valid @RequestBody request: ChoreRequest): ChoreResponse {
         return ChoreResponse.fromDomain(
             updateChoreUseCase.updateChore(
                 currentName = name,
@@ -64,7 +68,7 @@ class ChoreController(
     }
 
     @DeleteMapping("/{name}")
-    fun deleteChore(@PathVariable name: String) {
+    fun deleteChore(@NotBlank @PathVariable name: String) {
         deleteChoreUseCase.deleteChore(name)
     }
 
