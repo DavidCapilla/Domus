@@ -180,4 +180,29 @@ class ChoreIntegrationTest {
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
     }
+
+    @Test
+    fun `addChore with trailing space saves trimmed name and allows update`() {
+        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val dueDate = LocalDate.now().plusDays(10).toString()
+
+        val postResponse = restTemplate.postForEntity(
+            "/api/chores",
+            HttpEntity("""{"name":" Take out trash ","dueDate":"$dueDate"}""", headers),
+            String::class.java,
+        )
+        assertThat(postResponse.statusCode).isEqualTo(HttpStatus.OK)
+
+        val trimmed = repository.findByName("Take out trash")
+        assertThat(trimmed).isNotNull
+
+        val updateResponse = restTemplate.exchange(
+            "/api/chores/{name}",
+            HttpMethod.PUT,
+            HttpEntity("""{"name":"Take out trash","dueDate":"$dueDate"}""", headers),
+            ChoreResponse::class.java,
+            "Take out trash",
+        )
+        assertThat(updateResponse.statusCode).isEqualTo(HttpStatus.OK)
+    }
 }
