@@ -10,9 +10,7 @@ import com.domus.chores.application.UpdateChoreUseCase
 import com.domus.chores.application.GetDashboardUseCase
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreNotFoundException
-import com.domus.chores.core.Schedule
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestParam
 
 @Controller
 class ChoreWebController(
@@ -48,32 +45,22 @@ class ChoreWebController(
 
     @PostMapping("/chores")
     fun addChore(
-        @RequestParam name: String,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dueDate: LocalDate,
-        @RequestParam scheduleType: String,
-        @RequestParam(required = false) days: String?,
+        @ModelAttribute form: ChoreForm,
         model: Model,
         response: HttpServletResponse,
     ): String {
-        if (name.isBlank()) {
+        if (form.name.isBlank()) {
             toast(response, "Name is required")
             return "dashboard/list :: chore-list"
         }
-        val schedule = when (scheduleType) {
-            "one_time" -> Schedule.OneTime
-            "every_n_days" -> {
-                val daysInt = days?.toIntOrNull()
-                if (daysInt == null || daysInt <= 0) {
-                    toast(response, "Days must be a positive number")
-                    return "dashboard/list :: chore-list"
-                }
-                Schedule.EveryNDays(daysInt)
-            }
-
-            else -> throw IllegalArgumentException("Unknown schedule type: $scheduleType")
+        val schedule = try {
+            form.toSchedule()
+        } catch (e: IllegalArgumentException) {
+            toast(response, e.message ?: "Invalid schedule")
+            return "dashboard/list :: chore-list"
         }
         try {
-            createChoreUseCase.addChore(name = name, dueDate = dueDate, schedule = schedule)
+            createChoreUseCase.addChore(name = form.name, dueDate = form.dueDate, schedule = schedule)
         } catch (e: ChoreAlreadyExistsException) {
             toast(response, "A chore with this name already exists")
             model.addAttribute("dashboard", dashboard())
@@ -108,35 +95,25 @@ class ChoreWebController(
     @PutMapping("/chores/{name}")
     fun updateChore(
         @PathVariable name: String,
-        @RequestParam newName: String,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dueDate: LocalDate,
-        @RequestParam scheduleType: String,
-        @RequestParam(required = false) days: String?,
+        @ModelAttribute form: ChoreUpdateForm,
         model: Model,
         response: HttpServletResponse,
     ): String {
-        if (newName.isBlank()) {
+        if (form.newName.isBlank()) {
             toast(response, "Name is required")
             return "dashboard/list :: chore-list"
         }
-        val schedule = when (scheduleType) {
-            "one_time" -> Schedule.OneTime
-            "every_n_days" -> {
-                val daysInt = days?.toIntOrNull()
-                if (daysInt == null || daysInt <= 0) {
-                    toast(response, "Days must be a positive number")
-                    return "dashboard/list :: chore-list"
-                }
-                Schedule.EveryNDays(daysInt)
-            }
-
-            else -> throw IllegalArgumentException("Unknown schedule type: $scheduleType")
+        val schedule = try {
+            form.toSchedule()
+        } catch (e: IllegalArgumentException) {
+            toast(response, e.message ?: "Invalid schedule")
+            return "dashboard/list :: chore-list"
         }
         try {
             updateChoreUseCase.updateChore(
                 currentName = name,
-                newName = newName,
-                dueDate = dueDate,
+                newName = form.newName,
+                dueDate = form.dueDate,
                 schedule = schedule
             )
         } catch (e: ChoreAlreadyExistsException) {
