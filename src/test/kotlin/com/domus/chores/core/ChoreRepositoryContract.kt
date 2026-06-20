@@ -77,7 +77,7 @@ abstract class ChoreRepositoryContract {
     fun `update changes chore fields`() {
         val saved = createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-01-01"))
         repository.save(saved)
-        assertTrue(repository.update(saved.id, createChore(id = saved.id, name = "Clean kitchen (updated)", dueDate = LocalDate.parse("2026-06-06"))))
+        assertTrue(repository.update(createChore(id = saved.id, name = "Clean kitchen (updated)", dueDate = LocalDate.parse("2026-06-06"))))
 
         assertTrue(repository.findById(saved.id) != null)
         val updated = repository.findById(saved.id)
@@ -88,7 +88,7 @@ abstract class ChoreRepositoryContract {
 
     @Test
     fun `update returns false for non-existent chore`() {
-        assertFalse(repository.update(UUID.randomUUID(), createChore(name = "Anything")))
+        assertFalse(repository.update(createChore(name = "Anything")))
     }
 
     @Test

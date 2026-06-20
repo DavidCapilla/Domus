@@ -70,9 +70,9 @@ class CsvChoreRepository(
     }
 
     @Synchronized
-    override fun update(id: UUID, chore: Chore): Boolean {
+    override fun update(chore: Chore): Boolean {
         val chores = readAll().toMutableList()
-        val index = chores.indexOfFirst { it.id == id }
+        val index = chores.indexOfFirst { it.id == chore.id }
         if (index == -1) return false
         chores[index] = chore
         writeAll(chores)

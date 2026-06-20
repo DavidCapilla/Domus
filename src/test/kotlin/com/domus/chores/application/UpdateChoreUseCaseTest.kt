@@ -27,7 +27,7 @@ class UpdateChoreUseCaseTest {
         val existing = createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(1))
         whenever(repository.findById(existing.id)).doReturn(existing)
         whenever(repository.findByName(ChoreName.of("Clean kitchen (updated)"))).doReturn(null)
-        whenever(repository.update(any(), any())).doReturn(true)
+        whenever(repository.update(any())).doReturn(true)
 
         val updated = useCase.updateChore(
             id = existing.id,
@@ -38,7 +38,7 @@ class UpdateChoreUseCaseTest {
 
         assertEquals(ChoreName.of("Clean kitchen (updated)"), updated.name)
         assertEquals(existing.id, updated.id)
-        verify(repository).update(existing.id, updated)
+        verify(repository).update(updated)
     }
 
     @Test
@@ -77,7 +77,7 @@ class UpdateChoreUseCaseTest {
     fun `updateChore preserves same name without conflict`() {
         val existing = createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(1))
         whenever(repository.findById(existing.id)).doReturn(existing)
-        whenever(repository.update(any(), any())).doReturn(true)
+        whenever(repository.update(any())).doReturn(true)
 
         val updated = useCase.updateChore(
             id = existing.id,

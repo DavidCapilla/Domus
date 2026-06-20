@@ -273,7 +273,7 @@ class ChoreWebControllerTest {
         fun `updates chore and returns fragment`() {
             val id = repository.allChores.first().id
             mockMvc.perform(put("/chores/{id}", id)
-                .param("newName", "Updated chore")
+                .param("name", "Updated chore")
                 .param("dueDate", "2026-06-25")
                 .param("scheduleType", "one_time"))
                 .andExpect(status().isOk)
@@ -285,7 +285,7 @@ class ChoreWebControllerTest {
         fun `returns error when new name is blank`() {
             val id = repository.allChores.first().id
             mockMvc.perform(put("/chores/{id}", id)
-                .param("newName", "")
+                .param("name", "")
                 .param("dueDate", "2026-06-25")
                 .param("scheduleType", "one_time"))
                 .andExpect(header().string("HX-Trigger", containsString("Name is required")))

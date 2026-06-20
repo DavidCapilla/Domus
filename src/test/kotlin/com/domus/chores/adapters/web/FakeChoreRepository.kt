@@ -29,8 +29,8 @@ class FakeChoreRepository : ChoreRepository {
         return !alreadyExists
     }
 
-    override fun update(id: UUID, chore: Chore): Boolean {
-        val existing = chores.find { it.id == id } ?: return false
+    override fun update(chore: Chore): Boolean {
+        val existing = chores.find { it.id == chore.id } ?: return false
         chores.remove(existing)
         chores.add(chore)
         return true

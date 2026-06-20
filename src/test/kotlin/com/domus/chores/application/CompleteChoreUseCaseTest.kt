@@ -32,14 +32,14 @@ class CompleteChoreUseCaseTest {
 
         assertEquals(CompletionOutcome.Finished, outcome)
         verify(repository).delete(chore.id)
-        verify(repository, never()).update(any(), any())
+        verify(repository, never()).update(any())
     }
 
     @Test
     fun `completeChore reschedules every-N-days chore`() {
         val chore = createChore(name = "Water plants", schedule = Schedule.EveryNDays(3))
         whenever(repository.findById(chore.id)).doReturn(chore)
-        whenever(repository.update(any(), any())).doReturn(true)
+        whenever(repository.update(any())).doReturn(true)
 
         val outcome = useCase.completeChore(chore.id)
 
@@ -47,7 +47,7 @@ class CompleteChoreUseCaseTest {
         assertEquals(chore.id, continued.chore.id)
         assertEquals(LocalDate.now().plusDays(3), continued.chore.dueDate)
         verify(repository, never()).delete(any())
-        verify(repository).update(chore.id, continued.chore)
+        verify(repository).update(continued.chore)
     }
 
     @Test

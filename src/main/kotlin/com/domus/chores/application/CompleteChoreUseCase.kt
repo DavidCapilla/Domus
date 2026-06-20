@@ -28,7 +28,7 @@ class CompleteChoreUseCase(val choreRepository: ChoreRepository) {
                 log.info("Chore completed and removed [id={}]", id)
             }
             is CompletionOutcome.Continued -> {
-                choreRepository.update(id, outcome.chore)
+                choreRepository.update(outcome.chore)
                 log.info("Chore completed and rescheduled [id={}, nextDueDate={}]", id, outcome.chore.dueDate)
             }
         }

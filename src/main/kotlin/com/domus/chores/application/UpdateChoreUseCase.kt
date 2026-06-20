@@ -40,7 +40,7 @@ class UpdateChoreUseCase(val choreRepository: ChoreRepository) {
         }
 
         val updated = Chore(existing.id, newChoreName, dueDate, schedule)
-        choreRepository.update(id, updated)
+        choreRepository.update(updated)
         log.info("Chore updated [id={}, newName={}, dueDate={}, schedule={}]", id, name, dueDate, schedule)
         return updated
     }
