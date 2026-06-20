@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.UUID
 
 abstract class ChoreRepositoryContract {
 
@@ -59,40 +60,59 @@ abstract class ChoreRepositoryContract {
     }
 
     @Test
-    fun `update changes chore fields`() {
-        repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-01-01")))
-        assertTrue(repository.update(ChoreName.of("Clean kitchen"), createChore(name = "Clean kitchen (updated)", dueDate = LocalDate.parse("2026-06-06"))))
+    fun `findById returns chore when it exists`() {
+        val saved = createChore(name = "Clean kitchen")
+        repository.save(saved)
+        val found = repository.findById(saved.id)
+        assertTrue(found != null)
+        assertEquals("Clean kitchen", found!!.name.value)
+    }
 
-        assertTrue(repository.findByName(ChoreName.of("Clean kitchen")) == null)
-        val updated = repository.findByName(ChoreName.of("Clean kitchen (updated)"))
+    @Test
+    fun `findById returns null for non-existent id`() {
+        assertTrue(repository.findById(UUID.randomUUID()) == null)
+    }
+
+    @Test
+    fun `update changes chore fields`() {
+        val saved = createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-01-01"))
+        repository.save(saved)
+        assertTrue(repository.update(saved.id, createChore(id = saved.id, name = "Clean kitchen (updated)", dueDate = LocalDate.parse("2026-06-06"))))
+
+        assertTrue(repository.findById(saved.id) != null)
+        val updated = repository.findById(saved.id)
         assertTrue(updated != null)
         assertEquals(LocalDate.parse("2026-06-06"), updated!!.dueDate)
+        assertEquals("Clean kitchen (updated)", updated.name.value)
     }
 
     @Test
     fun `update returns false for non-existent chore`() {
-        assertFalse(repository.update(ChoreName.of("Non-existent"), createChore(name = "Anything")))
+        assertFalse(repository.update(UUID.randomUUID(), createChore(name = "Anything")))
     }
 
     @Test
     fun `delete removes existing chore`() {
-        repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusWeeks(1)))
+        val saved = createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusWeeks(1))
+        repository.save(saved)
 
-        assertTrue(repository.delete(ChoreName.of("Clean kitchen")))
+        assertTrue(repository.delete(saved.id))
         assertTrue(repository.findAll().isEmpty())
     }
 
     @Test
     fun `delete returns false for non-existent chore`() {
-        assertFalse(repository.delete(ChoreName.of("Non-existent")))
+        assertFalse(repository.delete(UUID.randomUUID()))
     }
 
     @Test
     fun `delete removes only the specified chore`() {
-        repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(7)))
-        repository.save(createChore(name = "Do laundry", dueDate = LocalDate.now().plusDays(14)))
+        val chore1 = createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(7))
+        val chore2 = createChore(name = "Do laundry", dueDate = LocalDate.now().plusDays(14))
+        repository.save(chore1)
+        repository.save(chore2)
 
-        assertTrue(repository.delete(ChoreName.of("Clean kitchen")))
+        assertTrue(repository.delete(chore1.id))
 
         val result = repository.findAll()
         assertEquals(1, result.size)

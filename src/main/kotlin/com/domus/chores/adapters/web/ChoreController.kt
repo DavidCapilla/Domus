@@ -11,10 +11,8 @@ import com.domus.chores.application.UpdateChoreUseCase
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreNotFoundException
 import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,10 +22,10 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/chores")
-@Validated
 class ChoreController(
     private val listChoresUseCase: ListChoresUseCase,
     private val createChoreUseCase: CreateChoreUseCase,
@@ -50,26 +48,26 @@ class ChoreController(
         )
     }
 
-    @PostMapping("/{name}/complete")
-    fun completeChore(@NotBlank @PathVariable name: String) {
-        completeChoreUseCase.completeChore(name)
+    @PostMapping("/{id}/complete")
+    fun completeChore(@PathVariable id: UUID) {
+        completeChoreUseCase.completeChore(id)
     }
 
-    @PutMapping("/{name}")
-    fun updateChore(@NotBlank @PathVariable name: String, @Valid @RequestBody request: ChoreRequest): ChoreResponse {
+    @PutMapping("/{id}")
+    fun updateChore(@PathVariable id: UUID, @Valid @RequestBody request: ChoreRequest): ChoreResponse {
         return ChoreResponse.fromDomain(
             updateChoreUseCase.updateChore(
-                currentName = name,
-                newName = request.name,
+                id = id,
+                name = request.name,
                 dueDate = request.dueDate,
                 schedule = request.schedule.toDomain(),
             )
         )
     }
 
-    @DeleteMapping("/{name}")
-    fun deleteChore(@NotBlank @PathVariable name: String) {
-        deleteChoreUseCase.deleteChore(name)
+    @DeleteMapping("/{id}")
+    fun deleteChore(@PathVariable id: UUID) {
+        deleteChoreUseCase.deleteChore(id)
     }
 
     @ExceptionHandler(ChoreAlreadyExistsException::class)

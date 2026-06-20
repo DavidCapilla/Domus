@@ -1,8 +1,8 @@
 function confirmDelete(btn) {
-    var choreName = btn.dataset.choreName;
+    var choreId = btn.dataset.choreId;
     Swal.fire({
         title: 'Delete chore?',
-        text: 'Delete "' + choreName + '"?',
+        text: 'Delete chore?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -10,7 +10,7 @@ function confirmDelete(btn) {
         confirmButtonText: 'Yes, delete it'
     }).then(function (result) {
         if (result.isConfirmed) {
-            htmx.ajax('DELETE', '/chores/' + encodeURIComponent(choreName), {
+            htmx.ajax('DELETE', '/chores/' + choreId, {
                 target: '#chore-list',
                 swap: 'outerHTML'
             });
@@ -19,10 +19,10 @@ function confirmDelete(btn) {
 }
 
 function confirmComplete(btn) {
-    var choreName = btn.dataset.choreName;
+    var choreId = btn.dataset.choreId;
     Swal.fire({
         title: 'Complete chore?',
-        text: 'Mark "' + choreName + '" as done?',
+        text: 'Mark chore as done?',
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#16a34a',
@@ -30,7 +30,7 @@ function confirmComplete(btn) {
         confirmButtonText: 'Yes, complete it'
     }).then(function (result) {
         if (result.isConfirmed) {
-            htmx.ajax('POST', '/chores/' + encodeURIComponent(choreName) + '/complete', {
+            htmx.ajax('POST', '/chores/' + choreId + '/complete', {
                 target: '#chore-list',
                 swap: 'outerHTML'
             });
@@ -68,8 +68,8 @@ function closeEditModal() {
 }
 
 function openDetailModal(el) {
-    var name = el.dataset.choreName;
-    htmx.ajax('GET', '/chores/' + encodeURIComponent(name) + '/detail', {
+    var id = el.dataset.choreId;
+    htmx.ajax('GET', '/chores/' + id + '/detail', {
         target: '#detail-modal-content',
         swap: 'innerHTML'
     });

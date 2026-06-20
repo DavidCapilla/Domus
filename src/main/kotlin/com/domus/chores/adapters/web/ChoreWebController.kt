@@ -9,10 +9,10 @@ import com.domus.chores.application.ListChoresUseCase
 import com.domus.chores.application.UpdateChoreUseCase
 import com.domus.chores.application.GetDashboardUseCase
 import com.domus.chores.core.ChoreAlreadyExistsException
-import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreNotFoundException
 import jakarta.servlet.http.HttpServletResponse
 import java.time.LocalDate
+import java.util.UUID
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -71,9 +71,9 @@ class ChoreWebController(
         return "dashboard/list :: chore-list"
     }
 
-    @GetMapping("/chores/{name}/edit")
-    fun editChoreForm(@PathVariable name: String, model: Model): String {
-        val chore = listChoresUseCase.getChores().find { it.name == ChoreName.of(name) }
+    @GetMapping("/chores/{id}/edit")
+    fun editChoreForm(@PathVariable id: UUID, model: Model): String {
+        val chore = listChoresUseCase.getChores().find { it.id == id }
         if (chore == null) {
             model.addAttribute("error", "Chore not found")
             return "fragments/error :: error-message"
@@ -82,10 +82,9 @@ class ChoreWebController(
         return "dashboard/edit-chore :: chore-edit"
     }
 
-    @GetMapping("/chores/{name}/detail")
-    fun choreDetail(@PathVariable name: String, model: Model): String {
-        // todo Domain leak
-        val chore = listChoresUseCase.getChores().find { it.name == ChoreName.of(name) }
+    @GetMapping("/chores/{id}/detail")
+    fun choreDetail(@PathVariable id: UUID, model: Model): String {
+        val chore = listChoresUseCase.getChores().find { it.id == id }
         if (chore == null) {
             model.addAttribute("error", "Chore not found")
             return "fragments/error :: error-message"
@@ -94,14 +93,14 @@ class ChoreWebController(
         return "dashboard/detail-chore :: chore-detail"
     }
 
-    @PutMapping("/chores/{name}")
+    @PutMapping("/chores/{id}")
     fun updateChore(
-        @PathVariable name: String,
+        @PathVariable id: UUID,
         @ModelAttribute form: ChoreUpdateForm,
         model: Model,
         response: HttpServletResponse,
     ): String {
-        if (form.newName.isBlank()) {
+        if (form.name.isBlank()) {
             toast(response, "Name is required")
             return "dashboard/list :: chore-list"
         }
@@ -113,8 +112,8 @@ class ChoreWebController(
         }
         try {
             updateChoreUseCase.updateChore(
-                currentName = name,
-                newName = form.newName,
+                id = id,
+                name = form.name,
                 dueDate = form.dueDate,
                 schedule = schedule
             )
@@ -131,10 +130,10 @@ class ChoreWebController(
         return "dashboard/list :: chore-list"
     }
 
-    @PostMapping("/chores/{name}/complete")
-    fun completeChore(@PathVariable name: String, model: Model, response: HttpServletResponse): String {
+    @PostMapping("/chores/{id}/complete")
+    fun completeChore(@PathVariable id: UUID, model: Model, response: HttpServletResponse): String {
         try {
-            completeChoreUseCase.completeChore(name)
+            completeChoreUseCase.completeChore(id)
         } catch (e: ChoreNotFoundException) {
             toast(response, "Chore not found.")
             model.addAttribute("dashboard", dashboard())
@@ -144,10 +143,10 @@ class ChoreWebController(
         return "dashboard/list :: chore-list"
     }
 
-    @DeleteMapping("/chores/{name}")
-    fun deleteChore(@PathVariable name: String, model: Model, response: HttpServletResponse): String {
+    @DeleteMapping("/chores/{id}")
+    fun deleteChore(@PathVariable id: UUID, model: Model, response: HttpServletResponse): String {
         try {
-            deleteChoreUseCase.deleteChore(name)
+            deleteChoreUseCase.deleteChore(id)
         } catch (e: ChoreNotFoundException) {
             toast(response, "Chore not found.")
             model.addAttribute("dashboard", dashboard())

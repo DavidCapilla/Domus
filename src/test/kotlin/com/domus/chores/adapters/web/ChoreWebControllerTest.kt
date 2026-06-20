@@ -61,14 +61,14 @@ class ChoreWebControllerTest {
         fun `modal form posts to correct endpoint`() {
             mockMvc.perform(get("/"))
                 .andExpect(content().string(containsString("hx-post=\"/chores\"")))
-                .andExpect(content().string(containsString("hx-target=\"#chore-list\"")))  // 2026-06-14: brittle
-                .andExpect(content().string(containsString("hx-swap=\"outerHTML\"")))       // 2026-06-14: brittle
+                .andExpect(content().string(containsString("hx-target=\"#chore-list\"")))
+                .andExpect(content().string(containsString("hx-swap=\"outerHTML\"")))
         }
 
         @Test
         fun `days field defaults to 7 and is hidden by default`() {
             mockMvc.perform(get("/"))
-                .andExpect(content().string(containsString("value=\"7\"")))  // 2026-06-14: brittle
+                .andExpect(content().string(containsString("value=\"7\"")))
                 .andExpect(content().string(containsString("display:none")))
         }
 
@@ -104,7 +104,7 @@ class ChoreWebControllerTest {
 
         @Test
         fun `shows empty message when no chores`() {
-            repository.findAll().forEach { repository.delete(it.name) }
+            repository.allChores.forEach { repository.delete(it.id) }
 
             mockMvc.perform(get("/"))
                 .andExpect(content().string(containsString("No overdue chores")))
@@ -243,22 +243,24 @@ class ChoreWebControllerTest {
 
         @Test
         fun `returns edit form with pre-filled name`() {
-            mockMvc.perform(get("/chores/{name}/edit", "Placeholder chore"))
+            val id = repository.allChores.first().id
+            mockMvc.perform(get("/chores/{id}/edit", id))
                 .andExpect(status().isOk)
                 .andExpect(content().string(containsString("value=\"Placeholder chore\"")))
-                .andExpect(content().string(containsString("hx-put=\"/chores/Placeholder chore\"")))
+                .andExpect(content().string(containsString("hx-put=\"/chores/$id\"")))
         }
 
         @Test
         fun `edit form has save and cancel buttons`() {
-            mockMvc.perform(get("/chores/{name}/edit", "Placeholder chore"))
+            val id = repository.allChores.first().id
+            mockMvc.perform(get("/chores/{id}/edit", id))
                 .andExpect(content().string(containsString("Save")))
                 .andExpect(content().string(containsString("Cancel")))
         }
 
         @Test
         fun `returns error message for non-existent chore`() {
-            mockMvc.perform(get("/chores/{name}/edit", "Non-existent"))
+            mockMvc.perform(get("/chores/{id}/edit", "00000000-0000-0000-0000-000000000000"))
                 .andExpect(status().isOk)
                 .andExpect(content().string(containsString("Chore not found")))
         }
@@ -269,7 +271,8 @@ class ChoreWebControllerTest {
 
         @Test
         fun `updates chore and returns fragment`() {
-            mockMvc.perform(put("/chores/{name}", "Placeholder chore")
+            val id = repository.allChores.first().id
+            mockMvc.perform(put("/chores/{id}", id)
                 .param("newName", "Updated chore")
                 .param("dueDate", "2026-06-25")
                 .param("scheduleType", "one_time"))
@@ -280,7 +283,8 @@ class ChoreWebControllerTest {
 
         @Test
         fun `returns error when new name is blank`() {
-            mockMvc.perform(put("/chores/{name}", "Placeholder chore")
+            val id = repository.allChores.first().id
+            mockMvc.perform(put("/chores/{id}", id)
                 .param("newName", "")
                 .param("dueDate", "2026-06-25")
                 .param("scheduleType", "one_time"))
@@ -293,7 +297,8 @@ class ChoreWebControllerTest {
 
         @Test
         fun `returns detail with name due date and schedule`() {
-            mockMvc.perform(get("/chores/{name}/detail", "Placeholder chore"))
+            val id = repository.allChores.first().id
+            mockMvc.perform(get("/chores/{id}/detail", id))
                 .andExpect(status().isOk)
                 .andExpect(content().string(containsString("Placeholder chore")))
                 .andExpect(content().string(containsString("Due date")))
@@ -302,7 +307,8 @@ class ChoreWebControllerTest {
 
         @Test
         fun `detail has edit and delete buttons`() {
-            mockMvc.perform(get("/chores/{name}/detail", "Placeholder chore"))
+            val id = repository.allChores.first().id
+            mockMvc.perform(get("/chores/{id}/detail", id))
                 .andExpect(status().isOk)
                 .andExpect(content().string(containsString("Edit")))
                 .andExpect(content().string(containsString("Delete")))
@@ -310,7 +316,7 @@ class ChoreWebControllerTest {
 
         @Test
         fun `returns error message for non-existent chore`() {
-            mockMvc.perform(get("/chores/{name}/detail", "Non-existent"))
+            mockMvc.perform(get("/chores/{id}/detail", "00000000-0000-0000-0000-000000000000"))
                 .andExpect(status().isOk)
                 .andExpect(content().string(containsString("Chore not found")))
         }
@@ -321,14 +327,16 @@ class ChoreWebControllerTest {
 
         @Test
         fun `completes chore and returns fragment`() {
-            mockMvc.perform(post("/chores/{name}/complete", "Placeholder chore"))
+            val chore = repository.allChores.first()
+            mockMvc.perform(post("/chores/{id}/complete", chore.id))
                 .andExpect(status().isOk)
                 .andExpect(content().string(not(containsString("Placeholder chore"))))
         }
 
         @Test
         fun `returns fragment without html wrapping after complete`() {
-            mockMvc.perform(post("/chores/{name}/complete", "Placeholder chore"))
+            val chore = repository.allChores.first()
+            mockMvc.perform(post("/chores/{id}/complete", chore.id))
                 .andExpect(content().string(not(containsString("<html"))))
         }
     }
@@ -338,14 +346,16 @@ class ChoreWebControllerTest {
 
         @Test
         fun `deletes chore and returns fragment`() {
-            mockMvc.perform(delete("/chores/{name}", "Placeholder chore"))
+            val chore = repository.allChores.first()
+            mockMvc.perform(delete("/chores/{id}", chore.id))
                 .andExpect(status().isOk)
                 .andExpect(content().string(not(containsString("Placeholder chore"))))
         }
 
         @Test
         fun `returns fragment without html wrapping after delete`() {
-            mockMvc.perform(delete("/chores/{name}", "Placeholder chore"))
+            val chore = repository.allChores.first()
+            mockMvc.perform(delete("/chores/{id}", chore.id))
                 .andExpect(content().string(not(containsString("<html"))))
         }
     }

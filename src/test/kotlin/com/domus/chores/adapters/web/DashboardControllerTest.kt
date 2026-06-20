@@ -25,7 +25,7 @@ class DashboardControllerTest {
     @BeforeEach
     fun setUp() {
         repository.reset()
-        repository.findAll().forEach { repository.delete(it.name) }
+        repository.allChores.forEach { repository.delete(it.id) }
     }
 
     @Test

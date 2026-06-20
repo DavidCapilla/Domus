@@ -1,10 +1,10 @@
 package com.domus.chores.application
 
-import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreNotFoundException
 import com.domus.chores.core.ChoreRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class DeleteChoreUseCase(val choreRepository: ChoreRepository) {
@@ -13,11 +13,11 @@ class DeleteChoreUseCase(val choreRepository: ChoreRepository) {
         private val log = LoggerFactory.getLogger(DeleteChoreUseCase::class.java)
     }
 
-    fun deleteChore(choreName: String) {
-        if (!choreRepository.delete(ChoreName.of(choreName))) {
-            log.warn("Chore not found for deletion [name={}]", choreName)
-            throw ChoreNotFoundException(choreName)
+    fun deleteChore(id: UUID) {
+        if (!choreRepository.delete(id)) {
+            log.warn("Chore not found for deletion [id={}]", id)
+            throw ChoreNotFoundException(id)
         }
-        log.info("Chore deleted [name={}]", choreName)
+        log.info("Chore deleted [id={}]", id)
     }
 }

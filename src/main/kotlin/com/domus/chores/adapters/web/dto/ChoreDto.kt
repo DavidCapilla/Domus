@@ -49,12 +49,14 @@ data class ChoreRequest(
 )
 
 data class ChoreResponse(
+    val id: String,
     val name: String,
     val dueDate: LocalDate,
     val schedule: ScheduleDto?,
 ) {
     companion object {
         fun fromDomain(chore: Chore) = ChoreResponse(
+            id = chore.id.toString(),
             name = chore.name.value,
             dueDate = chore.dueDate,
             schedule = chore.schedule.toDto(),

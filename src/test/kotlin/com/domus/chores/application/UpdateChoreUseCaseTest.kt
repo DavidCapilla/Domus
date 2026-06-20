@@ -15,6 +15,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
+import java.util.UUID
 
 class UpdateChoreUseCaseTest {
 
@@ -24,29 +25,31 @@ class UpdateChoreUseCaseTest {
     @Test
     fun `updateChore updates existing chore with new fields`() {
         val existing = createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(1))
-        whenever(repository.findByName(ChoreName.of("Clean kitchen"))).doReturn(existing)
+        whenever(repository.findById(existing.id)).doReturn(existing)
+        whenever(repository.findByName(ChoreName.of("Clean kitchen (updated)"))).doReturn(null)
         whenever(repository.update(any(), any())).doReturn(true)
 
         val updated = useCase.updateChore(
-            currentName = "Clean kitchen",
-            newName = "Clean kitchen (updated)",
+            id = existing.id,
+            name = "Clean kitchen (updated)",
             dueDate = LocalDate.now().plusDays(5),
             schedule = Schedule.EveryNDays(3),
         )
 
         assertEquals(ChoreName.of("Clean kitchen (updated)"), updated.name)
         assertEquals(existing.id, updated.id)
-        verify(repository).update(ChoreName.of("Clean kitchen"), updated)
+        verify(repository).update(existing.id, updated)
     }
 
     @Test
-    fun `updateChore throws when current name not found`() {
-        whenever(repository.findByName(ChoreName.of("Non-existent"))).doReturn(null)
+    fun `updateChore throws when id not found`() {
+        val id = UUID.randomUUID()
+        whenever(repository.findById(id)).doReturn(null)
 
         assertThrows(ChoreNotFoundException::class.java) {
             useCase.updateChore(
-                currentName = "Non-existent",
-                newName = "Anything",
+                id = id,
+                name = "Anything",
                 dueDate = LocalDate.now(),
                 schedule = Schedule.OneTime,
             )
@@ -56,13 +59,14 @@ class UpdateChoreUseCaseTest {
     @Test
     fun `updateChore throws when new name conflicts with existing chore`() {
         val existing = createChore(name = "Clean kitchen")
-        whenever(repository.findByName(ChoreName.of("Clean kitchen"))).doReturn(existing)
-        whenever(repository.findByName(ChoreName.of("Do laundry"))).doReturn(createChore(name = "Do laundry"))
+        val conflicting = createChore(name = "Do laundry")
+        whenever(repository.findById(existing.id)).doReturn(existing)
+        whenever(repository.findByName(ChoreName.of("Do laundry"))).doReturn(conflicting)
 
         assertThrows(ChoreAlreadyExistsException::class.java) {
             useCase.updateChore(
-                currentName = "Clean kitchen",
-                newName = "Do laundry",
+                id = existing.id,
+                name = "Do laundry",
                 dueDate = LocalDate.now(),
                 schedule = Schedule.OneTime,
             )
@@ -72,12 +76,12 @@ class UpdateChoreUseCaseTest {
     @Test
     fun `updateChore preserves same name without conflict`() {
         val existing = createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(1))
-        whenever(repository.findByName(ChoreName.of("Clean kitchen"))).doReturn(existing)
+        whenever(repository.findById(existing.id)).doReturn(existing)
         whenever(repository.update(any(), any())).doReturn(true)
 
         val updated = useCase.updateChore(
-            currentName = "Clean kitchen",
-            newName = "Clean kitchen",
+            id = existing.id,
+            name = "Clean kitchen",
             dueDate = LocalDate.now().plusDays(10),
             schedule = Schedule.OneTime,
         )
