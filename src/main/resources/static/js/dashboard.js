@@ -1,8 +1,9 @@
 function confirmDelete(btn) {
     var choreId = btn.dataset.choreId;
+    var choreName = btn.dataset.choreName;
     Swal.fire({
         title: 'Delete chore?',
-        text: 'Delete chore?',
+        text: 'Delete "' + choreName + '"?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -20,9 +21,10 @@ function confirmDelete(btn) {
 
 function confirmComplete(btn) {
     var choreId = btn.dataset.choreId;
+    var choreName = btn.dataset.choreName;
     Swal.fire({
         title: 'Complete chore?',
-        text: 'Mark chore as done?',
+        text: 'Mark "' + choreName + '" as done?',
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#16a34a',
