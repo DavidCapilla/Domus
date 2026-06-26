@@ -24,7 +24,7 @@ class FakeChoreRepository : ChoreRepository {
     override fun findById(id: UUID) = chores.find { it.id == id }
 
     override fun save(chore: Chore): Boolean {
-        val alreadyExists = chores.any { it.name == chore.name }
+        val alreadyExists = chores.any { it.id == chore.id }
         if (!alreadyExists) chores.add(chore)
         return !alreadyExists
     }

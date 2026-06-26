@@ -4,6 +4,7 @@ import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.Schedule
+import com.domus.chores.createChore
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.mockito.kotlin.any
@@ -22,6 +23,7 @@ class CreateChoreUseCaseTest {
 
     @Test
     fun `addChore saves chore with generated id and proper fields`() {
+        whenever(repository.findByName(ChoreName.of("Take out trash"))).doReturn(null)
         whenever(repository.save(any())).doReturn(true)
         useCase.addChore("Take out trash", dueDate, Schedule.OneTime)
         verify(repository).save(argThat { chore ->
@@ -32,7 +34,16 @@ class CreateChoreUseCaseTest {
     }
 
     @Test
+    fun `addChore throws when chore with same name already exists`() {
+        whenever(repository.findByName(ChoreName.of("Clean kitchen"))).doReturn(createChore(name = "Clean kitchen"))
+        assertThrows(ChoreAlreadyExistsException::class.java) {
+            useCase.addChore("Clean kitchen", dueDate, Schedule.OneTime)
+        }
+    }
+
+    @Test
     fun `addChore throws when chore already exists`() {
+        whenever(repository.findByName(ChoreName.of("Take out trash"))).doReturn(null)
         whenever(repository.save(any())).doReturn(false)
         assertThrows(ChoreAlreadyExistsException::class.java) {
             useCase.addChore("Clean kitchen", dueDate, Schedule.OneTime)

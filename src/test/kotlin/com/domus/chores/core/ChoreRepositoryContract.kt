@@ -30,18 +30,10 @@ abstract class ChoreRepositoryContract {
     }
 
     @Test
-    fun `duplicated chore by name is rejected even with different fields`() {
-        assertTrue(repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-01-01"))))
-        assertFalse(repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.parse("2026-06-06"))))
-
-        assertEquals(1, repository.findAll().size)
-    }
-
-    @Test
-    fun `duplicated chores are not saved`() {
+    fun `duplicated chore by id is rejected`() {
         val chore = createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(3))
         assertTrue(repository.save(chore))
-        assertFalse(repository.save(chore))
+        assertFalse(repository.save(createChore(id = chore.id, name = "Different name", dueDate = LocalDate.parse("2026-06-06"))))
 
         assertEquals(1, repository.findAll().size)
     }

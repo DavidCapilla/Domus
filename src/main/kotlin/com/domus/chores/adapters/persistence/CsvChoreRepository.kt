@@ -63,7 +63,7 @@ class CsvChoreRepository(
     @Synchronized
     override fun save(chore: Chore): Boolean {
         val chores = readAll().toMutableList()
-        if (chores.any { it.name == chore.name }) return false
+        if (chores.any { it.id == chore.id }) return false
         chores.add(chore)
         writeAll(chores)
         return true
