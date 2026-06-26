@@ -58,18 +58,21 @@ class CsvChoreRepository(
     override fun findByName(name: ChoreName): Chore? = readAll().find { it.name == name }
 
     @Synchronized
+    override fun findById(id: UUID): Chore? = readAll().find { it.id == id }
+
+    @Synchronized
     override fun save(chore: Chore): Boolean {
         val chores = readAll().toMutableList()
-        if (chores.any { it.name == chore.name }) return false
+        if (chores.any { it.id == chore.id }) return false
         chores.add(chore)
         writeAll(chores)
         return true
     }
 
     @Synchronized
-    override fun update(currentName: ChoreName, chore: Chore): Boolean {
+    override fun update(chore: Chore): Boolean {
         val chores = readAll().toMutableList()
-        val index = chores.indexOfFirst { it.name == currentName }
+        val index = chores.indexOfFirst { it.id == chore.id }
         if (index == -1) return false
         chores[index] = chore
         writeAll(chores)
@@ -77,9 +80,9 @@ class CsvChoreRepository(
     }
 
     @Synchronized
-    override fun delete(choreName: ChoreName): Boolean {
+    override fun delete(id: UUID): Boolean {
         val chores = readAll().toMutableList()
-        val removed = chores.removeAll { it.name == choreName }
+        val removed = chores.removeAll { it.id == id }
         if (removed) writeAll(chores)
         return removed
     }

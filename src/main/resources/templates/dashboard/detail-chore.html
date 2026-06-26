@@ -15,10 +15,10 @@
         <div th:text="${chore.schedule.displayName}">schedule</div>
     </div>
     <div class="flex gap-2 pt-2 border-t">
-        <button th:attr="hx-get=|/chores/${chore.name}/edit|" hx-target="#edit-modal-content" hx-swap="innerHTML"
+        <button th:attr="hx-get=|/chores/${chore.id}/edit|" hx-target="#edit-modal-content" hx-swap="innerHTML"
                 hx-on::after-request="closeDetailModal(); document.getElementById('edit-chore-modal').classList.remove('hidden')"
                 class="flex-1 px-3 py-2 border rounded text-sm hover:bg-gray-100">Edit</button>
-        <button th:attr="data-chore-name=${chore.name}" onclick="closeDetailModal(); confirmDelete(this)"
+        <button th:attr="data-chore-id=${chore.id}" onclick="closeDetailModal(); confirmDelete(this)"
                 class="flex-1 px-3 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700">Delete</button>
     </div>
 </div>

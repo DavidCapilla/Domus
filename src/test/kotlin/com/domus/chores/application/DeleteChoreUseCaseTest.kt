@@ -1,6 +1,5 @@
 package com.domus.chores.application
 
-import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreNotFoundException
 import com.domus.chores.core.ChoreRepository
 import org.junit.jupiter.api.Test
@@ -10,6 +9,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.UUID
 
 class DeleteChoreUseCaseTest {
 
@@ -18,14 +18,15 @@ class DeleteChoreUseCaseTest {
 
     @Test
     fun `deleteChore deletes existing chore`() {
-        whenever(repository.delete(ChoreName.of("Clean kitchen"))).doReturn(true)
-        useCase.deleteChore("Clean kitchen")
-        verify(repository).delete(ChoreName.of("Clean kitchen"))
+        val id = UUID.randomUUID()
+        whenever(repository.delete(id)).doReturn(true)
+        useCase.deleteChore(id)
+        verify(repository).delete(id)
     }
 
     @Test
     fun `deleteChore throws when chore not found`() {
         whenever(repository.delete(any())).doReturn(false)
-        assertThrows(ChoreNotFoundException::class.java) { useCase.deleteChore("Clean kitchen") }
+        assertThrows(ChoreNotFoundException::class.java) { useCase.deleteChore(UUID.randomUUID()) }
     }
 }

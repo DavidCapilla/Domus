@@ -27,11 +27,16 @@ class ChoreIntegrationTest {
     @Autowired
     private lateinit var repository: ChoreRepository
 
+    private lateinit var cleanKitchenId: java.util.UUID
+    private lateinit var doLaundryId: java.util.UUID
+
     @BeforeEach
     fun setUp() {
-        repository.findAll().forEach { repository.delete(it.name) }
+        repository.findAll().forEach { repository.delete(it.id) }
         repository.save(createChore(name = "Clean kitchen", dueDate = LocalDate.now().plusDays(5)))
         repository.save(createChore(name = "Do laundry", dueDate = LocalDate.now().plusDays(10)))
+        cleanKitchenId = repository.findByName(ChoreName.of("Clean kitchen"))!!.id
+        doLaundryId = repository.findByName(ChoreName.of("Do laundry"))!!.id
     }
 
     @Test
@@ -80,11 +85,11 @@ class ChoreIntegrationTest {
         }
         val dueDate = LocalDate.now().plusDays(15).toString()
         val response = restTemplate.exchange(
-            "/api/chores/{name}",
+            "/api/chores/{id}",
             HttpMethod.PUT,
             HttpEntity("""{"name":"Clean kitchen","dueDate":"$dueDate"}""", headers),
             ChoreResponse::class.java,
-            "Clean kitchen",
+            cleanKitchenId,
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -99,11 +104,11 @@ class ChoreIntegrationTest {
         }
         val dueDate = LocalDate.now().plusDays(15).toString()
         val response = restTemplate.exchange(
-            "/api/chores/{name}",
+            "/api/chores/{id}",
             HttpMethod.PUT,
             HttpEntity("""{"name":"Anything","dueDate":"$dueDate"}""", headers),
             String::class.java,
-            "Non-existent",
+            "00000000-0000-0000-0000-000000000000",
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
@@ -111,14 +116,16 @@ class ChoreIntegrationTest {
 
     @Test
     fun `completeChore deletes one-time chore`() {
-        repository.save(createChore(name = "One-off task", schedule = Schedule.OneTime))
+        val oneOff = createChore(name = "One-off task", schedule = Schedule.OneTime)
+        repository.save(oneOff)
+        val oneOffId = repository.findByName(ChoreName.of("One-off task"))!!.id
 
         val response = restTemplate.exchange(
-            "/api/chores/{name}/complete",
+            "/api/chores/{id}/complete",
             HttpMethod.POST,
             null,
             String::class.java,
-            "One-off task",
+            oneOffId,
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -127,18 +134,20 @@ class ChoreIntegrationTest {
 
     @Test
     fun `completeChore reschedules every-N-days chore`() {
-        repository.save(createChore(name = "Recurring task", schedule = Schedule.EveryNDays(7)))
+        val recurring = createChore(name = "Recurring task", schedule = Schedule.EveryNDays(7))
+        repository.save(recurring)
+        val recurringId = repository.findByName(ChoreName.of("Recurring task"))!!.id
 
         val response = restTemplate.exchange(
-            "/api/chores/{name}/complete",
+            "/api/chores/{id}/complete",
             HttpMethod.POST,
             null,
             String::class.java,
-            "Recurring task",
+            recurringId,
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        val updated = repository.findByName(ChoreName.of("Recurring task"))
+        val updated = repository.findById(recurringId)
         assertThat(updated).isNotNull
         assertThat(updated!!.dueDate).isEqualTo(LocalDate.now().plusDays(7))
     }
@@ -146,11 +155,11 @@ class ChoreIntegrationTest {
     @Test
     fun `completeChore returns 404 for non-existent chore`() {
         val response = restTemplate.exchange(
-            "/api/chores/{name}/complete",
+            "/api/chores/{id}/complete",
             HttpMethod.POST,
             null,
             String::class.java,
-            "Non-existent",
+            "00000000-0000-0000-0000-000000000000",
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
@@ -159,11 +168,11 @@ class ChoreIntegrationTest {
     @Test
     fun `deleteChore returns 200 when chore exists`() {
         val response = restTemplate.exchange(
-            "/api/chores/{name}",
+            "/api/chores/{id}",
             HttpMethod.DELETE,
             null,
             String::class.java,
-            "Clean kitchen",
+            cleanKitchenId,
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -172,11 +181,11 @@ class ChoreIntegrationTest {
     @Test
     fun `deleteChore returns 404 when chore not found`() {
         val response = restTemplate.exchange(
-            "/api/chores/{name}",
+            "/api/chores/{id}",
             HttpMethod.DELETE,
             null,
             String::class.java,
-            "Non-existent",
+            "00000000-0000-0000-0000-000000000000",
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
@@ -197,12 +206,13 @@ class ChoreIntegrationTest {
         val trimmed = repository.findByName(ChoreName.of("Take out trash"))
         assertThat(trimmed).isNotNull
 
+        val trimmedId = trimmed!!.id
         val updateResponse = restTemplate.exchange(
-            "/api/chores/{name}",
+            "/api/chores/{id}",
             HttpMethod.PUT,
             HttpEntity("""{"name":"Take out trash","dueDate":"$dueDate"}""", headers),
             ChoreResponse::class.java,
-            "Take out trash",
+            trimmedId,
         )
         assertThat(updateResponse.statusCode).isEqualTo(HttpStatus.OK)
     }

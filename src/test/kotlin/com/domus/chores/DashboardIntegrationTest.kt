@@ -23,7 +23,7 @@ class DashboardIntegrationTest {
 
     @BeforeEach
     fun setUp() {
-        repository.findAll().forEach { repository.delete(it.name) }
+        repository.findAll().forEach { repository.delete(it.id) }
         repository.save(createChore(name = "Overdue chore", dueDate = LocalDate.now().minusDays(2)))
         repository.save(
             createChore(
@@ -50,7 +50,7 @@ class DashboardIntegrationTest {
 
     @Test
     fun `getDashboard returns empty lists when no chores exist`() {
-        repository.findAll().forEach { repository.delete(it.name) }
+        repository.findAll().forEach { repository.delete(it.id) }
 
         val response = restTemplate.getForEntity("/api/dashboard", DashboardResponse::class.java)
 

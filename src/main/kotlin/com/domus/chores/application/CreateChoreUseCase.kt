@@ -18,12 +18,32 @@ class CreateChoreUseCase(val choreRepository: ChoreRepository) {
     }
 
     fun addChore(name: String, dueDate: LocalDate, schedule: Schedule) {
-        val chore =
-            Chore(id = UUID.randomUUID(), name = ChoreName.of(name), dueDate = dueDate, schedule = schedule)
-        if (!choreRepository.save(chore)) {
+        if (choreRepository.findByName(ChoreName.of(name)) != null) {
             log.warn("Chore not created: name already exists [name={}]", name)
             throw ChoreAlreadyExistsException(name)
         }
-        log.info("Chore created [name={}, dueDate={}, schedule={}]", name, dueDate, schedule)
+        val chore = Chore(
+            id = UUID.randomUUID(),
+            name = ChoreName.of(name),
+            dueDate = dueDate,
+            schedule = schedule
+        )
+        if (!choreRepository.save(chore)) {
+            log.warn(
+                "Chore not created, try again [id={}, name={}, dueDate={}, schedule={}]",
+                chore.id,
+                chore.name.value,
+                chore.dueDate,
+                chore.schedule,
+            )
+            throw ChoreAlreadyExistsException(name)
+        }
+        log.info(
+            "Chore created [id={}, name={}, dueDate={}, schedule={}]",
+            chore.id,
+            chore.name.value,
+            chore.dueDate,
+            chore.schedule,
+        )
     }
 }

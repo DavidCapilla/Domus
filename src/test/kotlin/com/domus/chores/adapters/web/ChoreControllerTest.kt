@@ -39,13 +39,14 @@ class ChoreControllerTest {
 
     @Test
     fun `completeChore returns 200 for existing chore`() {
-        mockMvc.perform(post("/api/chores/{name}/complete", "Placeholder chore"))
+        val id = repository.allChores.first().id
+        mockMvc.perform(post("/api/chores/{id}/complete", id))
             .andExpect(status().isOk)
     }
 
     @Test
     fun `completeChore returns 404 for non-existent chore`() {
-        mockMvc.perform(post("/api/chores/{name}/complete", "Non-existent"))
+        mockMvc.perform(post("/api/chores/{id}/complete", "00000000-0000-0000-0000-000000000000"))
             .andExpect(status().isNotFound)
     }
 
@@ -77,11 +78,12 @@ class ChoreControllerTest {
 
     @Test
     fun `updateChore returns 200 for existing chore`() {
+        val id = repository.allChores.first().id
         val dueDate = LocalDate.now().plusDays(7).toString()
         val json = """{"name":"Placeholder chore","dueDate":"$dueDate"}"""
 
         mockMvc.perform(
-            put("/api/chores/{name}", "Placeholder chore")
+            put("/api/chores/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         )
@@ -95,7 +97,7 @@ class ChoreControllerTest {
         val json = """{"name":"Anything","dueDate":"$dueDate"}"""
 
         mockMvc.perform(
-            put("/api/chores/{name}", "Non-existent")
+            put("/api/chores/{id}", "00000000-0000-0000-0000-000000000000")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         )
@@ -104,13 +106,14 @@ class ChoreControllerTest {
 
     @Test
     fun `deleteChore returns 200 when chore exists`() {
-        mockMvc.perform(delete("/api/chores/{name}", "Placeholder chore"))
+        val id = repository.allChores.first().id
+        mockMvc.perform(delete("/api/chores/{id}", id))
             .andExpect(status().isOk)
     }
 
     @Test
     fun `deleteChore returns 404 when chore not found`() {
-        mockMvc.perform(delete("/api/chores/{name}", "Non-existent"))
+        mockMvc.perform(delete("/api/chores/{id}", "00000000-0000-0000-0000-000000000000"))
             .andExpect(status().isNotFound)
     }
 }

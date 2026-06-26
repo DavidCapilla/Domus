@@ -1,12 +1,12 @@
 package com.domus.chores.application
 
-import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreNotFoundException
 import com.domus.chores.core.ChoreRepository
 import com.domus.chores.core.CompletionOutcome
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.util.UUID
 
 @Service
 class CompleteChoreUseCase(val choreRepository: ChoreRepository) {
@@ -15,22 +15,21 @@ class CompleteChoreUseCase(val choreRepository: ChoreRepository) {
         private val log = LoggerFactory.getLogger(CompleteChoreUseCase::class.java)
     }
 
-    fun completeChore(name: String): CompletionOutcome {
-        val choreName = ChoreName.of(name)
-        val chore = choreRepository.findByName(choreName)
+    fun completeChore(id: UUID): CompletionOutcome {
+        val chore = choreRepository.findById(id)
         if (chore == null) {
-            log.warn("Chore not found for completion [name={}]", name)
-            throw ChoreNotFoundException(name)
+            log.warn("Chore not found for completion [id={}]", id)
+            throw ChoreNotFoundException(id)
         }
         val outcome = chore.complete(LocalDate.now())
         when (outcome) {
             is CompletionOutcome.Finished -> {
-                choreRepository.delete(choreName)
-                log.info("Chore completed and removed [name={}]", name)
+                choreRepository.delete(id)
+                log.info("Chore completed and removed [id={}]", id)
             }
             is CompletionOutcome.Continued -> {
-                choreRepository.update(choreName, outcome.chore)
-                log.info("Chore completed and rescheduled [name={}, nextDueDate={}]", name, outcome.chore.dueDate)
+                choreRepository.update(outcome.chore)
+                log.info("Chore completed and rescheduled [id={}, nextDueDate={}]", id, outcome.chore.dueDate)
             }
         }
         return outcome

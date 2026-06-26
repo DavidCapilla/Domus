@@ -13,7 +13,7 @@ data class ChoreForm(
 )
 
 data class ChoreUpdateForm(
-    val newName: String,
+    val name: String,
     @param:DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     val dueDate: LocalDate,
     val scheduleType: String,
