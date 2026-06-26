@@ -5,7 +5,7 @@ import com.domus.chores.adapters.web.dto.DashboardResponse
 import com.domus.chores.application.CompleteChoreUseCase
 import com.domus.chores.application.CreateChoreUseCase
 import com.domus.chores.application.DeleteChoreUseCase
-import com.domus.chores.application.ListChoresUseCase
+import com.domus.chores.application.GetChoreUseCase
 import com.domus.chores.application.UpdateChoreUseCase
 import com.domus.chores.application.GetDashboardUseCase
 import com.domus.chores.core.ChoreAlreadyExistsException
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping
 
 @Controller
 class ChoreWebController(
-    private val listChoresUseCase: ListChoresUseCase,
+    private val getChoreUseCase: GetChoreUseCase,
     private val getDashboardUseCase: GetDashboardUseCase,
     private val createChoreUseCase: CreateChoreUseCase,
     private val updateChoreUseCase: UpdateChoreUseCase,
@@ -73,7 +73,7 @@ class ChoreWebController(
 
     @GetMapping("/chores/{id}/edit")
     fun editChoreForm(@PathVariable id: UUID, model: Model): String {
-        val chore = listChoresUseCase.getChores().find { it.id == id }
+        val chore = getChoreUseCase.getChore(id)
         if (chore == null) {
             model.addAttribute("error", "Chore not found")
             return "fragments/error :: error-message"
@@ -84,7 +84,7 @@ class ChoreWebController(
 
     @GetMapping("/chores/{id}/detail")
     fun choreDetail(@PathVariable id: UUID, model: Model): String {
-        val chore = listChoresUseCase.getChores().find { it.id == id }
+        val chore = getChoreUseCase.getChore(id)
         if (chore == null) {
             model.addAttribute("error", "Chore not found")
             return "fragments/error :: error-message"
