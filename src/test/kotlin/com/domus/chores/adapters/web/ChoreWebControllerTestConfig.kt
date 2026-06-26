@@ -3,6 +3,7 @@ package com.domus.chores.adapters.web
 import com.domus.chores.application.CompleteChoreUseCase
 import com.domus.chores.application.CreateChoreUseCase
 import com.domus.chores.application.DeleteChoreUseCase
+import com.domus.chores.application.GetChoreUseCase
 import com.domus.chores.application.GetDashboardUseCase
 import com.domus.chores.application.ListChoresUseCase
 import com.domus.chores.application.UpdateChoreUseCase
@@ -24,6 +25,10 @@ class ChoreWebControllerTestConfig {
 
     @Bean
     fun choreRepository(): ChoreRepository = FakeChoreRepository()
+
+    @Bean
+    fun getChoreUseCase(repo: ChoreRepository): GetChoreUseCase =
+        GetChoreUseCase(repo)
 
     @Bean
     fun listChoresUseCase(repo: ChoreRepository): ListChoresUseCase =
