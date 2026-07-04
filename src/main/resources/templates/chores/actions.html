@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="complete-button(chore)">
+    <button th:attr="data-chore-id=${chore.id},data-chore-name=${chore.name}" onclick="event.stopPropagation(); confirmComplete(this)"
+            class="shrink-0 px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Complete</button>
+</th:block>
+<th:block th:fragment="delete-button(chore)">
+    <div class="swipe-reveal-action absolute inset-y-0 right-0 flex items-center z-0 bg-red-600 rounded-lg px-5">
+        <button th:attr="data-chore-id=${chore.id},data-chore-name=${chore.name}" onclick="event.stopPropagation(); confirmDelete(this)"
+                class="text-white text-sm font-medium whitespace-nowrap">Delete</button>
+    </div>
+</th:block>
+</body>
+</html>
