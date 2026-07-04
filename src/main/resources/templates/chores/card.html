@@ -9,14 +9,11 @@
          role="button" tabindex="0">
         <div class="flex flex-col gap-2">
             <div class="flex justify-between items-center">
-                <span th:if="${status == 'overdue'}"
-                      class="text-xs font-medium text-red-700 bg-red-100 px-2 py-0.5 rounded-full"
-                      th:text="|${today.toEpochDay() - chore.dueDate.toEpochDay()}d overdue|">overdue N days</span>
-                <span th:if="${status == 'due-today'}"
-                      class="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">today</span>
-                <span th:if="${status == 'upcoming'}"
-                      class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full"
-                      th:text="|In ${chore.dueDate.toEpochDay() - today.toEpochDay()}d|">in N days</span>
+                <th:block th:replace="~{chores/status :: status(
+                    chore=${chore},
+                    status=${status},
+                    days=${chore.dueDate.toEpochDay() - today.toEpochDay()})}">
+                </th:block>
                 <button th:attr="data-chore-id=${chore.id},data-chore-name=${chore.name}" onclick="event.stopPropagation(); confirmComplete(this)"
                         class="shrink-0 px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Complete</button>
             </div>
