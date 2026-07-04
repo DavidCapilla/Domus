@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="schedule-icon(chore)">
+    <span th:if="${!chore.schedule.isOneTime}" class="shrink-0 text-sm mt-0.5">🔁</span>
+    <span th:if="${chore.schedule.isOneTime}" class="shrink-0 text-sm mt-0.5">1️⃣</span>
+</th:block>
+</body>
+</html>

@@ -21,8 +21,7 @@
                         class="shrink-0 px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">Complete</button>
             </div>
             <div class="flex items-start gap-2">
-                <span th:if="${!chore.schedule.isOneTime}" class="shrink-0 text-sm mt-0.5">🔁</span>
-                <span th:if="${chore.schedule.isOneTime}" class="shrink-0 text-sm mt-0.5">1️⃣</span>
+                <th:block th:replace="~{chores/schedule-icon :: schedule-icon(chore=${chore})}"></th:block>
                 <span class="font-semibold text-base leading-tight break-words line-clamp-2" th:text="${chore.name}">name</span>
             </div>
         </div>
