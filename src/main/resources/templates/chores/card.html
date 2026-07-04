@@ -9,15 +9,14 @@
              class="swipe-reveal-content relative z-10 bg-white card border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-gray-400 hover:shadow-sm transition-shadow min-h-[6.5rem]"
              role="button" tabindex="0">
             <div class="flex flex-col gap-2">
-                <!-- Actions -->
-                <div class="flex justify-end items-center">
-                    <th:block th:replace="~{chores/actions :: complete-button(chore=${chore})}"></th:block>
-                </div>
                 <!-- Header -->
                 <div class="flex items-start gap-2">
                     <th:block th:replace="~{chores/schedule-icon :: schedule-icon(chore=${chore})}"></th:block>
                     <span class="font-semibold text-base leading-tight break-words line-clamp-2" th:text="${chore.name}">name</span>
                 </div>
+            </div>
+            <div class="absolute bottom-2 right-2">
+                <th:block th:replace="~{chores/actions :: complete-button(chore=${chore})}"></th:block>
             </div>
         </div>
         <th:block th:replace="~{chores/actions :: delete-button(chore=${chore})}"></th:block>
