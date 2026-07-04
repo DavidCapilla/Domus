@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="due-badge(chore, days)">
+    <div th:if="${days < 0}" class="absolute -top-3 -right-2 z-20">
+        <span class="rounded-full bg-red-100 text-red-700 text-xs px-2 py-0.5 shadow"
+              th:text="|${-days}d overdue|">overdue</span>
+    </div>
+    <div th:if="${days == 0}" class="absolute -top-3 -right-2 z-20">
+        <span class="rounded-full bg-amber-100 text-amber-700 text-xs px-2 py-0.5 shadow">Today</span>
+    </div>
+    <div th:if="${days > 0}" class="absolute -top-3 -right-2 z-20">
+        <span class="rounded-full bg-gray-100 text-gray-600 text-xs px-2 py-0.5 shadow"
+              th:text="|In ${days}d|">upcoming</span>
+    </div>
+</th:block>
+</body>
+</html>
