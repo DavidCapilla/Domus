@@ -10,7 +10,7 @@
 <form th:fragment="chore-edit" class="space-y-3" th:attr="hx-put=|/chores/${chore.id}|"
       hx-target="#chore-list" hx-swap="outerHTML"
       hx-on::after-request="closeEditModal()">
-    <input type="text" name="newName" th:value="${chore.name}" required="required"
+    <input type="text" name="name" th:value="${chore.name}" required="required"
            class="p-2 border rounded w-full">
     <input type="date" name="dueDate" th:value="${chore.dueDate}" required="required"
            class="p-2 border rounded w-full">
