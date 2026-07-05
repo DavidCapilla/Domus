@@ -21,14 +21,17 @@ class CsvChoreRepository(
         return Files.readAllLines(csvPath).drop(1)
             .filter { it.isNotBlank() }
             .map { line ->
-                val parts = line.split(",", limit = 5)
+                val parts = line.split(",", limit = 4)
                 Chore(
                     id = UUID.fromString(parts[0]),
                     name = ChoreName.of(parts[1]),
                     dueDate = LocalDate.parse(parts[2]),
-                    schedule = when (parts[3]) {
-                        "one_time" -> Schedule.OneTime
-                        "every_n_days" -> Schedule.EveryNDays(parts[4].toInt())
+                    schedule = when {
+                        parts[3] == "one_time" -> Schedule.OneTime
+                        parts[3].startsWith("every_n_days") -> {
+                            val days = parts[3].removeSurrounding("every_n_days(", ")").toInt()
+                            Schedule.EveryNDays(days)
+                        }
                         else -> error("Unknown schedule type: ${parts[3]}")
                     },
                 )
@@ -38,17 +41,17 @@ class CsvChoreRepository(
     private fun writeAll(chores: List<Chore>) {
         val dir = csvPath.parent
         if (dir != null && !Files.exists(dir)) Files.createDirectories(dir)
-        val lines = mutableListOf("id,name,dueDate,scheduleType,days")
+        val lines = mutableListOf("id,name,dueDate,scheduleType")
         lines.addAll(chores.map { it.toCsvLine() })
         Files.write(csvPath, lines)
     }
 
     private fun Chore.toCsvLine(): String {
-        val (scheduleType, days) = when (val s = schedule) {
-            is Schedule.OneTime -> "one_time" to ""
-            is Schedule.EveryNDays -> "every_n_days" to s.days.toString()
+        val scheduleType = when (val s = schedule) {
+            is Schedule.OneTime -> "one_time"
+            is Schedule.EveryNDays -> "every_n_days(${s.days})"
         }
-        return listOf(id.toString(), name.value, dueDate.toString(), scheduleType, days).joinToString(",")
+        return listOf(id.toString(), name.value, dueDate.toString(), scheduleType).joinToString(",")
     }
 
     @Synchronized
