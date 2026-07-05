@@ -1,14 +1,15 @@
 package com.domus.chores.adapters.web
 
+import com.domus.chores.adapters.web.dto.AreaDto
 import com.domus.chores.adapters.web.dto.ChoreResponse
 import com.domus.chores.adapters.web.dto.DashboardResponse
+import com.domus.chores.adapters.web.dto.toDomain
 import com.domus.chores.application.CompleteChoreUseCase
 import com.domus.chores.application.CreateChoreUseCase
 import com.domus.chores.application.DeleteChoreUseCase
 import com.domus.chores.application.GetChoreUseCase
 import com.domus.chores.application.UpdateChoreUseCase
 import com.domus.chores.application.GetDashboardUseCase
-import com.domus.chores.core.Area
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreNotFoundException
 import jakarta.servlet.http.HttpServletResponse
@@ -40,7 +41,7 @@ class ChoreWebController(
         DashboardResponse.fromDomain(getDashboardUseCase.getDashboard())
 
     @ModelAttribute("areas")
-    fun areas(): Array<Area> = Area.entries.toTypedArray()
+    fun areas(): Array<AreaDto> = AreaDto.entries.toTypedArray()
 
     @GetMapping("/")
     fun index(): String = "dashboard/page"
@@ -64,9 +65,8 @@ class ChoreWebController(
             toast(response, e.message ?: "Invalid schedule")
             return "dashboard/list :: chore-list"
         }
-        val area = form.area.let { Area.valueOf(it) }
         try {
-            createChoreUseCase.addChore(name = form.name, dueDate = form.dueDate, schedule = schedule, area = area)
+            createChoreUseCase.addChore(name = form.name, dueDate = form.dueDate, schedule = schedule, area = form.area.toDomain())
         } catch (e: ChoreAlreadyExistsException) {
             toast(response, "A chore with this name already exists")
             model.addAttribute("dashboard", dashboard())
@@ -115,14 +115,13 @@ class ChoreWebController(
             toast(response, e.message ?: "Invalid schedule")
             return "dashboard/list :: chore-list"
         }
-        val area = form.area.let { Area.valueOf(it) }
         try {
             updateChoreUseCase.updateChore(
                 id = id,
                 name = form.name,
                 dueDate = form.dueDate,
                 schedule = schedule,
-                area = area,
+                area = form.area.toDomain(),
             )
         } catch (e: ChoreAlreadyExistsException) {
             toast(response, "A chore with this name already exists")
