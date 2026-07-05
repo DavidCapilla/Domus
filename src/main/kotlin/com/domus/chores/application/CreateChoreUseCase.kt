@@ -1,5 +1,6 @@
 package com.domus.chores.application
 
+import com.domus.chores.core.Area
 import com.domus.chores.core.Chore
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreName
@@ -17,7 +18,7 @@ class CreateChoreUseCase(val choreRepository: ChoreRepository) {
         private val log = LoggerFactory.getLogger(CreateChoreUseCase::class.java)
     }
 
-    fun addChore(name: String, dueDate: LocalDate, schedule: Schedule) {
+    fun addChore(name: String, dueDate: LocalDate, schedule: Schedule, area: Area) {
         if (choreRepository.findByName(ChoreName.of(name)) != null) {
             log.warn("Chore not created: name already exists [name={}]", name)
             throw ChoreAlreadyExistsException(name)
@@ -26,24 +27,27 @@ class CreateChoreUseCase(val choreRepository: ChoreRepository) {
             id = UUID.randomUUID(),
             name = ChoreName.of(name),
             dueDate = dueDate,
-            schedule = schedule
+            schedule = schedule,
+            area = area,
         )
         if (!choreRepository.save(chore)) {
             log.warn(
-                "Chore not created, try again [id={}, name={}, dueDate={}, schedule={}]",
+                "Chore not created, try again [id={}, name={}, dueDate={}, schedule={}, area={}]",
                 chore.id,
                 chore.name.value,
                 chore.dueDate,
                 chore.schedule,
+                chore.area,
             )
             throw ChoreAlreadyExistsException(name)
         }
         log.info(
-            "Chore created [id={}, name={}, dueDate={}, schedule={}]",
+            "Chore created [id={}, name={}, dueDate={}, schedule={}, area={}]",
             chore.id,
             chore.name.value,
             chore.dueDate,
             chore.schedule,
+            chore.area,
         )
     }
 }

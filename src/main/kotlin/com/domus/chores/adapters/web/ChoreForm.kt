@@ -1,5 +1,6 @@
 package com.domus.chores.adapters.web
 
+import com.domus.chores.adapters.web.dto.AreaDto
 import com.domus.chores.core.Schedule
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
@@ -10,6 +11,7 @@ data class ChoreForm(
     val dueDate: LocalDate,
     val scheduleType: String,
     val days: String? = null,
+    val area: AreaDto = AreaDto.NONE,
 )
 
 data class ChoreUpdateForm(
@@ -18,6 +20,7 @@ data class ChoreUpdateForm(
     val dueDate: LocalDate,
     val scheduleType: String,
     val days: String? = null,
+    val area: AreaDto = AreaDto.NONE,
 )
 
 private fun parseSchedule(scheduleType: String, days: String?): Schedule {

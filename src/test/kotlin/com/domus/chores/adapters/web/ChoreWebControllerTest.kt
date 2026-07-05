@@ -1,5 +1,7 @@
 package com.domus.chores.adapters.web
 
+import com.domus.chores.core.Area
+import com.domus.chores.core.ChoreName
 import com.domus.chores.createChore
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.not
@@ -55,6 +57,8 @@ class ChoreWebControllerTest {
                 .andExpect(content().string(containsString("value=\"one_time\"")))
                 .andExpect(content().string(containsString("value=\"every_n_days\"")))
                 .andExpect(content().string(containsString("name=\"days\"")))
+                .andExpect(content().string(containsString("name=\"area\"")))
+                .andExpect(content().string(containsString("Kitchen")))
         }
 
         @Test
@@ -129,7 +133,12 @@ class ChoreWebControllerTest {
 
         @Test
         fun `cards have status data attribute`() {
-            repository.save(createChore(name = "Badge test chore", dueDate = LocalDate.of(2026, 6, 2)))
+            repository.save(
+                createChore(
+                    name = "Badge test chore",
+                    dueDate = LocalDate.of(2026, 6, 2)
+                )
+            )
 
             mockMvc.perform(get("/"))
                 .andExpect(content().string(containsString("data-status=\"overdue\"")))
@@ -169,10 +178,13 @@ class ChoreWebControllerTest {
 
         @Test
         fun `creates chore and returns updated fragment`() {
-            mockMvc.perform(post("/chores")
-                .param("name", "New chore")
-                .param("dueDate", "2026-06-20")
-                .param("scheduleType", "one_time"))
+            mockMvc.perform(
+                post("/chores")
+                    .param("name", "New chore")
+                    .param("dueDate", "2026-06-20")
+                    .param("scheduleType", "one_time")
+                    .param("area", Area.NONE.name)
+            )
                 .andExpect(status().isOk)
                 .andExpect(content().string(containsString("New chore")))
                 .andExpect(content().string(containsString("Placeholder chore")))
@@ -180,60 +192,105 @@ class ChoreWebControllerTest {
 
         @Test
         fun `creates recurring chore with every_n_days`() {
-            mockMvc.perform(post("/chores")
-                .param("name", "Recurring chore")
-                .param("dueDate", "2026-06-20")
-                .param("scheduleType", "every_n_days")
-                .param("days", "3"))
+            mockMvc.perform(
+                post("/chores")
+                    .param("name", "Recurring chore")
+                    .param("dueDate", "2026-06-20")
+                    .param("scheduleType", "every_n_days")
+                    .param("days", "3")
+                    .param("area", Area.NONE.name)
+            )
                 .andExpect(status().isOk)
                 .andExpect(content().string(containsString("Recurring chore")))
         }
 
         @Test
         fun `returns error when name is blank`() {
-            mockMvc.perform(post("/chores")
-                .param("name", "")
-                .param("dueDate", "2026-06-20")
-                .param("scheduleType", "one_time"))
+            mockMvc.perform(
+                post("/chores")
+                    .param("name", "")
+                    .param("dueDate", "2026-06-20")
+                    .param("scheduleType", "one_time")
+                    .param("area", Area.NONE.name)
+            )
                 .andExpect(header().string("HX-Trigger", containsString("Name is required")))
         }
 
         @Test
         fun `returns error when days is invalid`() {
-            mockMvc.perform(post("/chores")
-                .param("name", "Bad chore")
-                .param("dueDate", "2026-06-20")
-                .param("scheduleType", "every_n_days")
-                .param("days", ""))
-                .andExpect(header().string("HX-Trigger", containsString("Days must be a positive number")))
+            mockMvc.perform(
+                post("/chores")
+                    .param("name", "Bad chore")
+                    .param("dueDate", "2026-06-20")
+                    .param("scheduleType", "every_n_days")
+                    .param("days", "")
+                    .param("area", Area.NONE.name)
+            )
+                .andExpect(
+                    header().string(
+                        "HX-Trigger",
+                        containsString("Days must be a positive number")
+                    )
+                )
         }
 
         @Test
         fun `returns error when days is zero`() {
-            mockMvc.perform(post("/chores")
-                .param("name", "Bad chore")
-                .param("dueDate", "2026-06-20")
-                .param("scheduleType", "every_n_days")
-                .param("days", "0"))
-                .andExpect(header().string("HX-Trigger", containsString("Days must be a positive number")))
+            mockMvc.perform(
+                post("/chores")
+                    .param("name", "Bad chore")
+                    .param("dueDate", "2026-06-20")
+                    .param("scheduleType", "every_n_days")
+                    .param("days", "0")
+                    .param("area", Area.NONE.name)
+            )
+                .andExpect(
+                    header().string(
+                        "HX-Trigger",
+                        containsString("Days must be a positive number")
+                    )
+                )
         }
 
         @Test
         fun `returns error message when chore already exists`() {
-            mockMvc.perform(post("/chores")
-                .param("name", "Placeholder chore")
-                .param("dueDate", "2026-06-20")
-                .param("scheduleType", "one_time"))
+            mockMvc.perform(
+                post("/chores")
+                    .param("name", "Placeholder chore")
+                    .param("dueDate", "2026-06-20")
+                    .param("scheduleType", "one_time")
+                    .param("area", Area.NONE.name)
+            )
                 .andExpect(status().isOk)
-                .andExpect(header().string("HX-Trigger", containsString("A chore with this name already exists")))
+                .andExpect(
+                    header().string(
+                        "HX-Trigger",
+                        containsString("A chore with this name already exists")
+                    )
+                )
+        }
+
+        @Test
+        fun `creates chore without area succeeds`() {
+            mockMvc.perform(
+                post("/chores")
+                    .param("name", "No-area chore")
+                    .param("dueDate", "2026-06-20")
+                    .param("scheduleType", "one_time")
+            )
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("No-area chore")))
         }
 
         @Test
         fun `returns fragment without html wrapping`() {
-            mockMvc.perform(post("/chores")
-                .param("name", "Fragment test")
-                .param("dueDate", "2026-06-20")
-                .param("scheduleType", "one_time"))
+            mockMvc.perform(
+                post("/chores")
+                    .param("name", "Fragment test")
+                    .param("dueDate", "2026-06-20")
+                    .param("scheduleType", "one_time")
+                    .param("area", Area.NONE.name)
+            )
                 .andExpect(content().string(not(containsString("<html"))))
         }
     }
@@ -256,6 +313,7 @@ class ChoreWebControllerTest {
             mockMvc.perform(get("/chores/{id}/edit", id))
                 .andExpect(content().string(containsString("Save")))
                 .andExpect(content().string(containsString("Cancel")))
+                .andExpect(content().string(containsString("name=\"area\"")))
         }
 
         @Test
@@ -272,10 +330,13 @@ class ChoreWebControllerTest {
         @Test
         fun `updates chore and returns fragment`() {
             val id = repository.allChores.first().id
-            mockMvc.perform(put("/chores/{id}", id)
-                .param("name", "Updated chore")
-                .param("dueDate", "2026-06-25")
-                .param("scheduleType", "one_time"))
+            mockMvc.perform(
+                put("/chores/{id}", id)
+                    .param("name", "Updated chore")
+                    .param("dueDate", "2026-06-25")
+                    .param("scheduleType", "one_time")
+                    .param("area", Area.NONE.name)
+            )
                 .andExpect(status().isOk)
                 .andExpect(content().string(not(containsString("Placeholder chore"))))
                 .andExpect(content().string(containsString("Updated chore")))
@@ -284,11 +345,27 @@ class ChoreWebControllerTest {
         @Test
         fun `returns error when new name is blank`() {
             val id = repository.allChores.first().id
-            mockMvc.perform(put("/chores/{id}", id)
-                .param("name", "")
-                .param("dueDate", "2026-06-25")
-                .param("scheduleType", "one_time"))
+            mockMvc.perform(
+                put("/chores/{id}", id)
+                    .param("name", "")
+                    .param("dueDate", "2026-06-25")
+                    .param("scheduleType", "one_time")
+                    .param("area", Area.NONE.name)
+            )
                 .andExpect(header().string("HX-Trigger", containsString("Name is required")))
+        }
+
+        @Test
+        fun `updates chore without area succeeds`() {
+            val id = repository.allChores.first().id
+            mockMvc.perform(
+                put("/chores/{id}", id)
+                    .param("name", "Updated chore")
+                    .param("dueDate", "2026-06-25")
+                    .param("scheduleType", "one_time")
+            )
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("Updated chore")))
         }
     }
 
@@ -296,13 +373,14 @@ class ChoreWebControllerTest {
     inner class ChoreDetail {
 
         @Test
-        fun `returns detail with name due date and schedule`() {
+        fun `returns detail with name due date schedule and area`() {
             val id = repository.allChores.first().id
             mockMvc.perform(get("/chores/{id}/detail", id))
                 .andExpect(status().isOk)
                 .andExpect(content().string(containsString("Placeholder chore")))
                 .andExpect(content().string(containsString("Due date")))
                 .andExpect(content().string(containsString("Schedule")))
+                .andExpect(content().string(containsString("Area")))
         }
 
         @Test
@@ -312,6 +390,16 @@ class ChoreWebControllerTest {
                 .andExpect(status().isOk)
                 .andExpect(content().string(containsString("Edit")))
                 .andExpect(content().string(containsString("Delete")))
+        }
+
+        @Test
+        fun `detail shows area`() {
+            val repo = repository
+            repo.save(com.domus.chores.createChore(name = "Kitchen Chore", area = Area.KITCHEN))
+            val id = repo.findByName(ChoreName.of("Kitchen Chore"))!!.id
+            mockMvc.perform(get("/chores/{id}/detail", id))
+                .andExpect(content().string(containsString("Area")))
+                .andExpect(content().string(containsString("Kitchen")))
         }
 
         @Test

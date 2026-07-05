@@ -1,7 +1,9 @@
 package com.domus.chores.adapters.web
 
+import com.domus.chores.adapters.web.dto.AreaDto
 import com.domus.chores.adapters.web.dto.ChoreResponse
 import com.domus.chores.adapters.web.dto.DashboardResponse
+import com.domus.chores.adapters.web.dto.toDomain
 import com.domus.chores.application.CompleteChoreUseCase
 import com.domus.chores.application.CreateChoreUseCase
 import com.domus.chores.application.DeleteChoreUseCase
@@ -38,6 +40,9 @@ class ChoreWebController(
     fun dashboard(): DashboardResponse =
         DashboardResponse.fromDomain(getDashboardUseCase.getDashboard())
 
+    @ModelAttribute("areas")
+    fun areas(): Array<AreaDto> = AreaDto.entries.toTypedArray()
+
     @GetMapping("/")
     fun index(): String = "dashboard/page"
 
@@ -61,7 +66,7 @@ class ChoreWebController(
             return "dashboard/list :: chore-list"
         }
         try {
-            createChoreUseCase.addChore(name = form.name, dueDate = form.dueDate, schedule = schedule)
+            createChoreUseCase.addChore(name = form.name, dueDate = form.dueDate, schedule = schedule, area = form.area.toDomain())
         } catch (e: ChoreAlreadyExistsException) {
             toast(response, "A chore with this name already exists")
             model.addAttribute("dashboard", dashboard())
@@ -115,7 +120,8 @@ class ChoreWebController(
                 id = id,
                 name = form.name,
                 dueDate = form.dueDate,
-                schedule = schedule
+                schedule = schedule,
+                area = form.area.toDomain(),
             )
         } catch (e: ChoreAlreadyExistsException) {
             toast(response, "A chore with this name already exists")

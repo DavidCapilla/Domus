@@ -1,5 +1,6 @@
 package com.domus.chores.application
 
+import com.domus.chores.core.Area
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreNotFoundException
@@ -34,10 +35,12 @@ class UpdateChoreUseCaseTest {
             name = "Clean kitchen (updated)",
             dueDate = LocalDate.now().plusDays(5),
             schedule = Schedule.EveryNDays(3),
+            area = Area.KITCHEN,
         )
 
         assertEquals(ChoreName.of("Clean kitchen (updated)"), updated.name)
         assertEquals(existing.id, updated.id)
+        assertEquals(Area.KITCHEN, updated.area)
         verify(repository).update(updated)
     }
 
@@ -52,6 +55,7 @@ class UpdateChoreUseCaseTest {
                 name = "Anything",
                 dueDate = LocalDate.now(),
                 schedule = Schedule.OneTime,
+                area = Area.NONE,
             )
         }
     }
@@ -69,6 +73,7 @@ class UpdateChoreUseCaseTest {
                 name = "Do laundry",
                 dueDate = LocalDate.now(),
                 schedule = Schedule.OneTime,
+                area = Area.EXTERIOR,
             )
         }
     }
@@ -84,6 +89,7 @@ class UpdateChoreUseCaseTest {
             name = "Clean kitchen",
             dueDate = LocalDate.now().plusDays(10),
             schedule = Schedule.OneTime,
+            area = Area.KITCHEN,
         )
 
         assertEquals(ChoreName.of("Clean kitchen"), updated.name)

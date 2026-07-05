@@ -1,5 +1,6 @@
 package com.domus.chores.application
 
+import com.domus.chores.core.Area
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreRepository
@@ -25,11 +26,23 @@ class CreateChoreUseCaseTest {
     fun `addChore saves chore with generated id and proper fields`() {
         whenever(repository.findByName(ChoreName.of("Take out trash"))).doReturn(null)
         whenever(repository.save(any())).doReturn(true)
-        useCase.addChore("Take out trash", dueDate, Schedule.OneTime)
+        useCase.addChore("Take out trash", dueDate, Schedule.OneTime, Area.NONE)
         verify(repository).save(argThat { chore ->
             (chore.name == ChoreName.of("Take out trash")
                     && chore.dueDate.isEqual(dueDate)
-                    && chore.schedule == Schedule.OneTime)
+                    && chore.schedule == Schedule.OneTime
+                    && chore.area == Area.NONE)
+        })
+    }
+
+    @Test
+    fun `addChore saves chore with area when provided`() {
+        whenever(repository.findByName(ChoreName.of("Clean kitchen"))).doReturn(null)
+        whenever(repository.save(any())).doReturn(true)
+        useCase.addChore("Clean kitchen", dueDate, Schedule.OneTime, Area.KITCHEN)
+        verify(repository).save(argThat { chore ->
+            chore.name == ChoreName.of("Clean kitchen")
+                    && chore.area == Area.KITCHEN
         })
     }
 
@@ -37,7 +50,7 @@ class CreateChoreUseCaseTest {
     fun `addChore throws when chore with same name already exists`() {
         whenever(repository.findByName(ChoreName.of("Clean kitchen"))).doReturn(createChore(name = "Clean kitchen"))
         assertThrows(ChoreAlreadyExistsException::class.java) {
-            useCase.addChore("Clean kitchen", dueDate, Schedule.OneTime)
+            useCase.addChore("Clean kitchen", dueDate, Schedule.OneTime, Area.NONE)
         }
     }
 
@@ -46,7 +59,7 @@ class CreateChoreUseCaseTest {
         whenever(repository.findByName(ChoreName.of("Take out trash"))).doReturn(null)
         whenever(repository.save(any())).doReturn(false)
         assertThrows(ChoreAlreadyExistsException::class.java) {
-            useCase.addChore("Clean kitchen", dueDate, Schedule.OneTime)
+            useCase.addChore("Clean kitchen", dueDate, Schedule.OneTime, Area.NONE)
         }
     }
 }

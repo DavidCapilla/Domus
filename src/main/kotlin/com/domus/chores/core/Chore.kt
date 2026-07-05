@@ -8,6 +8,7 @@ data class Chore(
     val name: ChoreName,
     val dueDate: LocalDate,
     val schedule: Schedule,
+    val area: Area = Area.NONE,
 ) {
     fun complete(on: LocalDate): CompletionOutcome = when (schedule) {
         is Schedule.OneTime -> CompletionOutcome.Finished
