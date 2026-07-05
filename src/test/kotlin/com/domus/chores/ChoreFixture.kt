@@ -1,5 +1,6 @@
 package com.domus.chores
 
+import com.domus.chores.core.Area
 import com.domus.chores.core.Chore
 import com.domus.chores.core.ChoreName
 import com.domus.chores.core.Schedule
@@ -11,4 +12,5 @@ fun createChore(
     name: String,
     dueDate: LocalDate = LocalDate.now(),
     schedule: Schedule = Schedule.OneTime,
-): Chore = Chore(id = id, name = ChoreName.of(name), dueDate = dueDate, schedule = schedule)
+    area: Area = Area.NONE,
+): Chore = Chore(id = id, name = ChoreName.of(name), dueDate = dueDate, schedule = schedule, area = area)
