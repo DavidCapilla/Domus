@@ -34,7 +34,6 @@
         </div>
         <div>
             <select name="area" class="p-2 border rounded w-full text-gray-700">
-                <option value="">No area</option>
                 <option th:each="a : ${areas}" th:value="${a.name}" th:text="${a.displayName}"></option>
             </select>
         </div>

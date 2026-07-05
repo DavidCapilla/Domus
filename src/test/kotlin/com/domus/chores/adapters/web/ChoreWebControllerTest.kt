@@ -271,6 +271,18 @@ class ChoreWebControllerTest {
         }
 
         @Test
+        fun `creates chore without area succeeds`() {
+            mockMvc.perform(
+                post("/chores")
+                    .param("name", "No-area chore")
+                    .param("dueDate", "2026-06-20")
+                    .param("scheduleType", "one_time")
+            )
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("No-area chore")))
+        }
+
+        @Test
         fun `returns fragment without html wrapping`() {
             mockMvc.perform(
                 post("/chores")
@@ -341,6 +353,19 @@ class ChoreWebControllerTest {
                     .param("area", Area.NONE.name)
             )
                 .andExpect(header().string("HX-Trigger", containsString("Name is required")))
+        }
+
+        @Test
+        fun `updates chore without area succeeds`() {
+            val id = repository.allChores.first().id
+            mockMvc.perform(
+                put("/chores/{id}", id)
+                    .param("name", "Updated chore")
+                    .param("dueDate", "2026-06-25")
+                    .param("scheduleType", "one_time")
+            )
+                .andExpect(status().isOk)
+                .andExpect(content().string(containsString("Updated chore")))
         }
     }
 
