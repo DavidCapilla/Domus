@@ -1,5 +1,6 @@
 package com.domus.chores.adapters.persistence
 
+import com.domus.chores.core.Area
 import com.domus.chores.core.Chore
 import com.domus.chores.core.ChoreName
 import com.domus.chores.core.ChoreRepository
@@ -21,7 +22,7 @@ class CsvChoreRepository(
         return Files.readAllLines(csvPath).drop(1)
             .filter { it.isNotBlank() }
             .map { line ->
-                val parts = line.split(",", limit = 4)
+                val parts = line.split(",", limit = 5)
                 Chore(
                     id = UUID.fromString(parts[0]),
                     name = ChoreName.of(parts[1]),
@@ -34,6 +35,7 @@ class CsvChoreRepository(
                         }
                         else -> error("Unknown schedule type: ${parts[3]}")
                     },
+                    area = Area.valueOf(parts[4]),
                 )
             }
     }
@@ -41,7 +43,7 @@ class CsvChoreRepository(
     private fun writeAll(chores: List<Chore>) {
         val dir = csvPath.parent
         if (dir != null && !Files.exists(dir)) Files.createDirectories(dir)
-        val lines = mutableListOf("id,name,dueDate,scheduleType")
+        val lines = mutableListOf("id,name,dueDate,scheduleType,area")
         lines.addAll(chores.map { it.toCsvLine() })
         Files.write(csvPath, lines)
     }
@@ -51,7 +53,7 @@ class CsvChoreRepository(
             is Schedule.OneTime -> "one_time"
             is Schedule.EveryNDays -> "every_n_days(${s.days})"
         }
-        return listOf(id.toString(), name.value, dueDate.toString(), scheduleType).joinToString(",")
+        return listOf(id.toString(), name.value, dueDate.toString(), scheduleType, area.name).joinToString(",")
     }
 
     @Synchronized
