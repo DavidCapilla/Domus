@@ -45,6 +45,7 @@ class ChoreController(
             name = request.name,
             dueDate = request.dueDate,
             schedule = request.schedule.toDomain(),
+            area = request.area.toDomain(),
         )
     }
 
@@ -61,6 +62,7 @@ class ChoreController(
                 name = request.name,
                 dueDate = request.dueDate,
                 schedule = request.schedule.toDomain(),
+                area = request.area.toDomain(),
             )
         )
     }
