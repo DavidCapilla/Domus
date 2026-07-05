@@ -1,5 +1,6 @@
 package com.domus.chores.application
 
+import com.domus.chores.core.Area
 import com.domus.chores.core.Chore
 import com.domus.chores.core.ChoreAlreadyExistsException
 import com.domus.chores.core.ChoreName
@@ -22,26 +23,31 @@ class UpdateChoreUseCase(val choreRepository: ChoreRepository) {
         id: UUID,
         name: String,
         dueDate: LocalDate,
-        schedule: Schedule
+        schedule: Schedule,
+        area: Area,
     ): Chore {
-        val newChoreName = ChoreName.of(name)
+        val choreName = ChoreName.of(name)
         val existing = choreRepository.findById(id)
         if (existing == null) {
             log.warn("Chore not found for update [id={}]", id)
             throw ChoreNotFoundException(id)
         }
 
-        if (existing.name != newChoreName) {
-            val existingWithNewName = choreRepository.findByName(newChoreName)
-            if (existingWithNewName != null) {
-                log.warn("Chore not updated: name already exists [id={}, newName={}]", id, name)
-                throw ChoreAlreadyExistsException(name)
-            }
+        if (existing.name != choreName && choreRepository.findByName(choreName) != null) {
+            log.warn("Chore not updated: name already exists [id={}, name={}]", id, name)
+            throw ChoreAlreadyExistsException(name)
         }
 
-        val updated = Chore(existing.id, newChoreName, dueDate, schedule)
+        val updated = Chore(existing.id, choreName, dueDate, schedule, area)
         choreRepository.update(updated)
-        log.info("Chore updated [id={}, newName={}, dueDate={}, schedule={}]", id, name, dueDate, schedule)
+        log.info(
+            "Chore updated [id={}, newName={}, dueDate={}, schedule={}, area={}]",
+            id,
+            name,
+            dueDate,
+            schedule,
+            area,
+        )
         return updated
     }
 }
