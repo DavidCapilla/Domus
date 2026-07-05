@@ -10,6 +10,7 @@ data class ChoreForm(
     val dueDate: LocalDate,
     val scheduleType: String,
     val days: String? = null,
+    val area: String,
 )
 
 data class ChoreUpdateForm(
@@ -18,6 +19,7 @@ data class ChoreUpdateForm(
     val dueDate: LocalDate,
     val scheduleType: String,
     val days: String? = null,
+    val area: String,
 )
 
 private fun parseSchedule(scheduleType: String, days: String?): Schedule {
